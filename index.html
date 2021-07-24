@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Shop Titans Assistant</title>
+<link rel="stylesheet" href="20210722.css">
+<script src="IndexedDB.js"></script>
+<script src="20210722.js"></script>
+</head>
+<body>
+<header>
+	<div class="flexwrap gap10">
+		<div class="toggle-button">
+			<label><input type="radio" class="changeMode showList" name="Mode" value="A" checked><span class="tglbutton">販売補助</span></label>
+			<label><input type="radio" class="changeMode showList" name="Mode" value="B"><span class="tglbutton">仕入補助</span></label>
+			<label><input type="radio" class="changeMode showList" name="Mode" value="C"><span class="tglbutton">付与補助</span></label>
+			<label><input type="radio" class="changeMode showList" name="Mode" value="D"><span class="tglbutton">開発進捗・寄付管理</span></label>
+			<label><input type="radio" class="changeMode showList" name="Mode" value="E"><span class="tglbutton">進化進捗管理</span></label>
+<!--
+			<label><input type="radio" class="changeMode showList" name="Mode" value="F"><span class="tglbutton">データチェック</span></label>
+-->
+		</div>
+		<div class="toggle-button">
+			<label><input type="radio" class="showList" name="Container" value="Type" checked><span class="tglbutton">タイプ別表示</span></label>
+			<label><input type="radio" class="showList" name="Container" value="Tier"><span class="tglbutton">ティア別表示</span></label>
+		</div>
+	</div>
+	<div class="flexwrap gap5">
+		<div class="toggle-button mt10 HideE">
+			<label><input type="radio" class="showList" name="Rack" value="" checked><img src="./image/All.png" width="40" height="40"></label>
+		</div>
+		<div class="toggle-button mt10 HideE">
+			<label description="剣・斧・メイス・槍・ステッキ">
+				<input type="radio" class="showList" name="Rack" value="RackA">
+				<img src="./image/RackA.png" width="40" height="40">
+			</label>
+		</div>
+		<div class="toggle-button mt10 HideE">
+			<label description="短刀・弓・杖・銃・クロスボウ・盾">
+				<input type="radio" class="showList" name="Rack" value="RackB">
+				<img src="./image/RackB.png" width="40" height="40">
+			</label>
+		</div>
+		<div class="toggle-button mt10 HideE">
+			<label description="ヘルメット・ローグの帽子・魔術師の帽子">
+				<input type="radio" class="showList" name="Rack" value="RackCH">
+				<img src="./image/RackC.png" width="40" height="40">
+				<img src="./image/RackCH.png" width="40" height="40">
+				</label>
+		</div>
+		<div class="toggle-button mt10 HideE">
+			<label description="ヘビーアーマー・ライトアーマー・衣服">
+				<input type="radio" class="showList" name="Rack" value="RackCA">
+				<img src="./image/RackC.png" width="40" height="40">
+				<img src="./image/RackCA.png" width="40" height="40">
+				</label>
+		</div>
+		<div class="toggle-button mt10 HideE">
+			<label description="ヘルメット・ローグの帽子・魔術師の帽子">
+				<input type="radio" class="showList" name="Rack" value="RackCO">
+				<img src="./image/RackC.png" width="40" height="40">
+				<img src="./image/RackCO.png" width="40" height="40">
+			</label>
+		</div>
+		<div class="toggle-button mt10 HideE">
+			<label description="ガントレット・ブレイザー・フットウェア（重）・フットウェア（軽）">
+				<input type="radio" class="showList" name="Rack" value="RackD">
+				<img src="./image/RackD.png" width="40" height="40">
+			</label>
+		</div>
+		<div class="toggle-button mt10 HideA HideB HideC HideD HideE">
+			<label description="ルーンストーン・ムーンストーン">
+				<input type="radio" class="showList" name="Rack" value="RackE">
+				<img src="./image/Stone.png" width="40" height="40">
+			</label>
+		</div>
+		<div class="toggle-button mt10 HideA HideB HideC HideE">
+			<label description="エレメント・精霊">
+				<input type="radio" class="showList" name="Rack" value="RackF">
+				<img src="./image/Enchantment.png" width="40" height="40">
+			</label>
+		</div>
+	</div>
+	<div class="flexwrap gap10">
+		<div class="toggle-button mt10 HideE">
+			<label><input type="radio" class="showList" name="groupTier" value="all" checked><span class="tglbutton">＊</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="1"><span class="tglbutton">１</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="2"><span class="tglbutton">２</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="3"><span class="tglbutton">３</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="4"><span class="tglbutton">４</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="5"><span class="tglbutton">５</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="6"><span class="tglbutton">６</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="7"><span class="tglbutton">７</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="8"><span class="tglbutton">８</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="9"><span class="tglbutton">９</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="10"><span class="tglbutton">10</span></label>
+			<label><input type="checkbox" class="showList" name="Tier" value="11"><span class="tglbutton">11</span></label>
+		</div>
+		<div class="toggle-button mt10 HideA HideD HideE">
+			<label><input type="radio" class="showList" name="Rarity" value="0" checked><span class="tglbutton q0">普通</span></label>
+			<label><input type="radio" class="showList" name="Rarity" value="1"><span class="tglbutton q1">上級</span></label>
+			<label><input type="radio" class="showList" name="Rarity" value="2"><span class="tglbutton q2">上質</span></label>
+			<label><input type="radio" class="showList" name="Rarity" value="3"><span class="tglbutton q3">エピック</span></label>
+			<label><input type="radio" class="showList" name="Rarity" value="4"><span class="tglbutton q4">レジェンド</span></label>
+		</div>
+	</div>
+	<div class="flexwrap gap10">
+		<div class="flexwrap gap5 HideD HideE">
+			<label description="あなたのお店の最大エネルギーを入力してください">
+				<input type="text" id="$MaxEnergy" class="showList mt10" data-para="MaxEnergy" size="5">
+			</label>
+			<label description="アイテム販売時に入手するカウンターエネルギーを入力してください">
+				<input type="text" id="$CounterEnergy" class="showList mt10" data-para="CounterEnergy" size="5">
+			</label>
+			<label description="いつも割引販売しているアイテムで下の計算を行い算出した値を入力してください&#010;　１エネルギーを得るのに消費した金額＝（販売価格÷２）÷割引販売時の入手エネルギー">
+				<input type="text" id="$Discount" class="showList mt10" data-para="Discount" size="5">
+			</label>
+			<label description="いつも追加料金販売しているアイテムで下の計算を行い算出した値を入力してください&#010;　１エネルギーで入手した金額＝（追加料金販売－販売価格）÷追加料金販売の消費エネルギー">
+				<input type="text" id="$Surchage" class="showList mt10" data-para="Surchage" size="5">
+			</label>
+			<label description="王様に販売に販売するアイテムの金額を入力してください">
+				<input type="text" id="$ForKing" class="showList mt10" data-para="ForKing" size="10">
+			</label>
+		</div>
+	</div>
+	<div class="flexwrap gap10">
+		<div class="flexwrap gap5 HideA HideB HideD HideE">
+			<select id="$ElementValue"class="mt10">
+				<option value="0">未選択</option>
+				<option value="350000">9.ティア９のエレメント</option>
+				<option value="105000">7.火のエレメント(火)</option>
+				<option value="100000">7.潮のエレメント(水)</option>
+				<option value="99500">7.強風のエレメント(風)</option>
+				<option value="96500">7.野生のエレメント(地)</option>
+				<option value="96500">7.聖なるエレメント(光)</option>
+				<option value="105000">7.不浄のエレメント(闇)</option>
+				<option value="8150">4.燃えさしのエレメント(火)</option>
+				<option value="7400">4.水疱のエレメント(水)</option>
+				<option value="8550">4.そよ風のエレメント(風)</option>
+				<option value="9800">4.自然のエレメント(地)</option>
+				<option value="9600">4.光のエレメント(光)</option>
+				<option value="10500">4.汚染のエレメント(闇)</option>
+			</select>
+			<select id="$SpiritValue"class="mt10">
+				<option value="0">未選択</option>
+				<option value="350000">9.ティア９の精霊</option>
+				<option value="110000">7.サイの精霊</option>
+				<option value="110000">7.フクロウの精霊</option>
+				<option value="115000">7.アルマジロの精霊</option>
+				<option value="125000">7.馬の精霊</option>
+				<option value="130000">7.カバの精霊</option>
+				<option value="130000">7.トカゲの精霊</option>
+				<option value="9200">4.狼の精霊</option>
+				<option value="9400">4.牡山羊の精霊</option>
+				<option value="9750">4.ワシの精霊</option>
+				<option value="10000">4.雄牛の精霊</option>
+				<option value="11000">4.毒蛇の精霊</option>
+				<option value="12000">4.猫の精霊</option>
+			</select>
+		</div>
+	</div>
+	<div class="flexwrap gap10">
+		<div class="toggle-button mt10 HideA HideB HideC HideE HideX">
+			<label><input type="radio" class="showList" name="Donated" value="all" checked><span class="tglbutton">すべて表示</span></label>
+			<label><input type="radio" class="showList" name="Donated" value="0"><span class="tglbutton q0">普通&#010;未寄付表示</span></label>
+			<label><input type="radio" class="showList" name="Donated" value="1"><span class="tglbutton q1">上級&#010;未寄付表示</span></label>
+			<label><input type="radio" class="showList" name="Donated" value="2"><span class="tglbutton q2">上質&#010;未寄付表示</span></label>
+			<label><input type="radio" class="showList" name="Donated" value="3"><span class="tglbutton q3">エピック&#010;未寄付表示</span></label>
+			<label><input type="radio" class="showList" name="Donated" value="4"><span class="tglbutton q4">レジェンド&#010;未寄付表示</span></label>
+		</div>
+	</div>
+<!--
+	<div class="flexwrap gap10">
+		<div class="toggle-button mt10 HideA HideB HideC HideD">
+			<label><input type="radio" class="switchItem" name="switch1" value="value1" checked><span class="tglbutton">価格</span></label>
+			<label><input type="radio" class="switchItem" name="switch1" value="value2"><span class="tglbutton">割引エネルギー</span></label>
+			<label><input type="radio" class="switchItem" name="switch1" value="value3"><span class="tglbutton">１エネルギー当たりの&#010;消費金額</span></label>
+			<label><input type="radio" class="switchItem" name="switch1" value="value4"><span class="tglbutton">追加料金エネルギー</span></label>
+			<label><input type="radio" class="switchItem" name="switch1" value="value5"><span class="tglbutton">１エネルギー当たりの&#010;獲得金額</span></label>
+		</div>
+		<div class="toggle-button mt10 HideA HideB HideC HideD">
+			<label><input type="checkbox" id="$ValueUp" class="showList" name="ValueUp"><span class="tglbutton">価格アップ適用</span></label>
+		</div>
+		<div class="toggle-button mt10 HideA HideB HideC HideD">
+			<label><input type="checkbox" id="$Learner" class="showList" name="Learner"><span class="tglbutton">ラーナー適用</span></label>
+		</div>
+	</div>
+-->
+</header>
+<main>
+
+	<div id="$List" class="flexwrap"></div>
+	<div class="information mt5 HideB HideC HideD HideE HideF">
+		NPC販売のエネルギー換算率を判定しお得な販売方法を指示します<br>
+		　－：通常販売推奨　半：割引販売推奨　倍：追加料金販売推奨　王：王様販売推奨<br>
+		　※赤字表示は未寄付アイテム、最大エネルギーが追加販売エネルギーに足りていないものは"－"表記となります<br>
+		<br>
+		マーク部分をクリックすると"注"表記となります<br>
+		マーケットでジェム売りしたいものや融合予定で集めているものに設定してください<br>
+		もう一度クリックすると解除されます<br>
+		<br>
+		エンチャントによる価格変化対応を検討中…<br>
+	</div>
+	<div class="information mt5 HideA HideC HideD HideE HideF">
+		マーケットでアイテムを仕入れる際の損をしない仕入れ値を計算します（仕入れは自己責任でお願いします）<br>
+		仕入れたものは追加料金販売する想定ですのでエネルギー換算率の低いものは表示対象外です<br>
+		<br>
+		「こんな仕入れの考え方もあるよ」ってアイディアあれば教えてください<br>
+		「ティア９仕入れてエンチャントして売るよ」ってどういう計算するのが正解ですかねぇ<br>
+	</div>
+	<div class="information mt5 HideA HideB HideD HideE HideF">
+		ショップタイタンは独自の金額丸め処理があるので付与するアイテムを選ばないと損するかも<br>
+		その補助となる機能にしたいけれどまだ検討中<br>
+	</div>
+	<div class="information mt5 HideA HideB HideC HideE HideF">
+		各アイテムの開発進捗と寄付状況を管理します<br>
+		チェックをつけると販売補助や仕入補助の計算がそれを考慮した値となります<br>
+		<br>
+		未寄付のアイテムが販売補助で赤文字表示になるのがお気に入り<br>
+	</div>
+	<div class="information mt5 HideA HideB HideC HideD HideF">
+		進化の軌跡を管理します<br>
+		販売補助や仕入補助のの計算がそれを考慮した値となります<br>
+		<br>
+		種類ごとの価格アップ対応、実はやってません<br>
+		そこまで進化を貯めた種類がないので検証できないんです、すみません<br>
+		全価格１％アップみたいに単純に販売価格に倍率含めて計算すればいいのかな？<br>
+		タイタン２つ、種類別価格アップ１つなら追加料金販売時に販売価格×2.07？<br>
+	</div>
+	<div class="information mt5 HideA HideB HideC HideD HideE">
+		モードF用
+	</div>
+
+	<template id="$ModeA_group">
+		<div class="cloned mr10 mb20">
+			<div class="flexwrap header title plr">
+				<span></span>
+			</div>
+		</div>
+	</template>
+		<template id="$ModeA_data">
+			<div class="flexwrap title data pl">
+				<span></span>
+				<span class="Keep plr q0"></span>
+				<span class="Keep plr q1"></span>
+				<span class="Keep plr q2"></span>
+				<span class="Keep plr q3"></span>
+				<span class="Keep plr q4"></span>
+			</div>
+		</template>
+
+	<template id="$ModeB_group">
+		<div class="cloned mr10 mb20">
+			<div class="flexwrap header title plr">
+				<span></span>
+			</div>
+		</div>
+	</template>
+		<template id="$ModeB_data">
+			<div class="flexwrap title data plr">
+				<span></span>
+				<span></span>
+			</div>
+		</template>
+
+	<template id="$ModeC_group">
+		<div class="cloned mr10 mb20">
+			<div class="flexwrap header title plr">
+				<span></span>
+			</div>
+		</div>
+	</template>
+		<template id="$ModeC_data">
+			<div class="flexwrap title data plr">
+				<span></span>
+				<label class="plr" title="追加料金エネルギー -10%"><input type="checkbox"></input></label>
+				<label class="plr" title="追加料金 +5%"><input type="checkbox"></input></label>
+				<label class="plr" title="全追加料金 +1%"><input type="checkbox"></input></label>
+			</div>
+		</template>
+
+	<template id="$ModeD_group">
+		<div class="cloned mr10 mb20">
+			<div class="flexwrap header title plr">
+				<span></span>
+			</div>
+		</div>
+	</template>
+		<template id="$ModeD_data">
+			<div class="flexwrap title data pl">
+				<span></span>
+				<label class="plr" description="設計図保有"><input type="checkbox"></input></label>
+				<label class="plr" description="価格アップ"><input type="checkbox"></input></label>
+				<label class="q0 plr" description="通常寄付"><input type="checkbox" class="Donation"></input></label>
+				<label class="q1 plr" description="上級寄付"><input type="checkbox" class="Donation"></input></label>
+				<label class="q2 plr" description="上質寄付"><input type="checkbox" class="Donation"></input></label>
+				<label class="q3 plr" description="エピック寄付"><input type="checkbox" class="Donation"></input></label>
+				<label class="q4 plr" description="レジェンド寄付"><input type="checkbox" class="Donation"></input></label>
+			</div>
+		</template>
+
+	<template id="$ModeE_group">
+		<div class="cloned mr10 mb20">
+			<div class="flexwrap header title plr">
+				<span></span>
+			</div>
+		</div>
+	</template>
+		<template id="$ModeE_data">
+			<div class="flexwrap title data plr">
+				<span></span>
+				<label class="plr" description="追加料金エネルギー -10%"><input type="checkbox"></input></label>
+				<label class="plr" description="追加料金 +5%"><input type="checkbox"></input></label>
+				<label class="plr" description="全追加料金 +1%"><input type="checkbox"></input></label>
+			</div>
+		</template>
+
+	<template id="$ModeF_group">
+		<div class="cloned mr10 mb20">
+			<div class="flexwrap header title plr">
+				<span></span>
+			</div>
+		</div>
+	</template>
+		<template id="$ModeF_data">
+			<div class="flexwrap title data plr">
+				<span></span>
+				<span class="switch1"></span>
+			</div>
+		</template>
+</main>
+<script type="text/csv" id="$Rack">
+RackA	Sword	Axe	Mace	Spear	Staff
+RackB	Dagger	Bow	Wand	Gun	Crossbow	Shield
+RackCH	Helmet	Rogue Hat	Magician Hat
+RackCA	Heavy Armor	Light Armor	Clothes
+RackCO	Gauntlets	Gloves	Heavy Footwear	Light Footwear
+RackD	Herbal Medicine	Potion	Spell	Ring	Amulet
+RackE	Stone
+RackF	Enchantment
+</script>
+<script type="text/csv" id="$TypeGroup">
+A	武器	Sword	Axe	Dagger	Mace	Spear	Bow	Wand	Staff	Gun	Crossbow
+B	アーマー	Heavy Armor	Light Armor	Clothes	Heavy Armor	Light Armor	Clothes	Gauntlets	Gloves	Heavy Footwear	Light Footwear
+C	アクセサリー	Herbal Medicine	Potion	Spell	Shield	Ring	Amulet
+D	ストーン	Stone
+E	付与魔法	Element	Spirit
+</script>
+<script type="text/csv" id="$Type">
+Sword	剣	RackA	A
+Axe	斧	RackA	A
+Dagger	短刀	RackB	A
+Mace	メイス	RackA	A
+Spear	槍	RackA	A
+Bow	弓	RackB	A
+Wand	杖	RackB	A
+Staff	ステッキ	RackA	A
+Gun	銃	RackB	A
+Crossbow	クロスボウ	RackB	A
+Heavy Armor	ヘビーアーマー	RackCA	B
+Light Armor	ライトアーマー	RackCA	B
+Clothes	衣服	RackCA	B
+Helmet	ヘルメット	RackCH	B
+Rogue Hat	ローグの帽子	RackCH	B
+Magician Hat	魔術師の帽子	RackCH	B
+Gauntlets	ガントレット	RackCO	B
+Gloves	ブレイザー	RackCO	B
+Heavy Footwear	フットウェア（重）	RackCO	B
+Light Footwear	フットウェア（軽）	RackCO	B
+Herbal Medicine	植物薬	RackD	C
+Potion	ポーション	RackD	C
+Spell	呪文	RackD	C
+Shield	盾	RackB	C
+Ring	リング	RackD	C
+Amulet	アミュレット	RackD	C
+Stone	ストーン	－	D
+Enchantment	エンチャント	－	E
+Element	エレメント	－	F
+Spirit	精霊	－	F
+</script>
+<script type="text/csv" id="$Tier">
+1	ティア１
+2	ティア２
+3	ティア３
+4	ティア４
+5	ティア５
+6	ティア６
+7	ティア７
+8	ティア８
+9	ティア９
+10	ティア10
+11	ティア11
+</script>
+<script type="text/csv" id="$EnchantedE">
+Canopy Cap
+Trailblazers
+Ice Pick
+Scroll of Cleansing
+Tailwind
+Darkwood Branch
+Arboreal Blade
+Swift Mitts
+Emerald Ring
+Aurum Ward
+Molten Voulge
+Eclipse Amulet
+Tome of the Night
+Brinewater Helm
+Amber Staff
+Ceremonial Breastplate
+Cindersole
+Hat of the Four Winds
+Triton Lance
+Vestal Raiments
+Sungrasp Gauntlets
+Glade Guard Armor
+Quetzalcoatl
+Black Wyrm Claws
+Meteor Hammer
+Stonesplitter
+Nomad Veil	
+Brinewater Do
+Bottled Mirth
+Soulstone Ring
+Damocles
+Levia Fang
+Mistpeak Bloom
+Alpine Stride
+Crusader Helmet
+Phoenix Staff
+Prometheon
+Tidebringer
+Gaia Enforcer
+Storm Dragon Mask
+Purgatory
+Plaguewalkers
+Amber Citadel
+Northwind Gem
+Caladbolg
+Terra Tyrannis
+Longinus
+Nightmare Fellblade
+Phoenix Litany
+Monsoon Heart
+Bleakspire Roots
+Last Breath
+Sunglow Impact
+Abyssal Hood
+</script>
+<script type="text/csv" id="$EnchantedS">
+Mundra's Masher
+Mundra's Hornbow
+Mundra's Scepter
+Mundra's Tabard
+Mundra's Amulet
+</script>
+<script type="text/csv" id="$Increase15">
+Squire Sword
+Arming Sword
+Wood Axe
+Hatchet
+Iron Chopper
+Explorer's Axe
+Shiv
+Ice Pick
+Swift Blade
+Stealth Knife
+Cudgel
+Spiked Cudgel
+Darkwood Branch
+Warhammer
+Liberty Mace
+Javelin
+Hunting Spear
+Bladed Spear
+Training Bow
+Elmwood Bow
+Reflex Bow
+Carved Branch
+Sturdy Cane
+Mintyleaf Herb
+Warm Tea
+Healing Potion
+Science Project
+Scroll of Storms
+Breastplate
+Iron Mail
+Scale Armor
+Leather Armor
+Gambeson
+Shirt
+Black Robe
+Sturdy Cap
+Warrior Helmet
+Brimmed Hat
+Feathered Hat
+Stitched Cone
+Black Cowl
+Druid Laurels
+Apprentice Tiara
+Iron Armguards
+Plated Gauntlets
+Leather Gloves
+Bracers
+Thief's Gloves
+Swift Mitts
+Patchleather Bracers
+Shin Guards
+Long Boots
+Iron Greaves
+Leather Boots
+Trailblazers
+Flip-Flops
+Soft Shoes
+Legionnaire Sandals
+Wooden Shield
+Heavy Buckler
+Oaken Shield
+</script>
+<script type="text/csv" id="$LocalName">
+Opulent Pistol	豪勢なピストル
+Squire Sword	スクワイアソード
+Arming Sword	アーミングソード
+Gladius	グラディウス
+Arboreal Blade	新緑のブレード
+Zweihander	ツヴァイハンダー
+Cutlass	カットラス
+Espada	エスパーダ
+Hero's Sword	ヒーローの剣
+Katana	刀
+Serrated Cinquedea	鋸歯のチンクエディア
+Regal Blade	荘厳な小太刀
+Celesteel Blade	セレスティール・ブレード
+Damocles	ダモクレス
+Luxurious Macuahuitl	豪華なマクアフティル
+Mythril Edge	ミスリルエッジ
+Seafarer Blade	船乗りの刃
+Gentleman Blade	紳士のブレード
+Oversized Cleaver	特大の包丁
+Caladbolg	カラドボルグ
+Dragon Dao	ドラゴンダオ
+Vorpal Sword	ボーパルの剣
+Elegant Rapier	エレガントなレイピア
+Wood Axe	ウッドアックス
+Hatchet	手おの
+Iron Chopper	アイアンチョッパー
+Explorer's Axe	探検者のアックス
+Bardiche	バルディッシュ
+Molten Voulge	灼熱の斧槍
+Tomahawk	トマホーク
+Companion Axe	斧の相棒
+Battleaxe	戦斧
+Raptor Reaper	猛禽類の死神
+Dwarven Greataxe	ドワーフの大斧
+Stonesplitter	ストーンスプリッター
+Raider Axe	レイダーアックス
+Executioner	エグゼキューショナー
+Purgatory	パーガトリー
+Axe of The Fifth	5月の斧
+Eclipsis	エクリプシス
+Terra Tyrannis	大地のティラニス
+Opulent Grandaxe	贅沢な大斧
+Kodiak Kleaver	コディアックの包丁
+Manticore Slayer	マンティコアスレイヤー
+Beeswaxe	蜜蝋
+Shiv	飛び出しナイフ
+Ice Pick	アイスピック
+Swift Blade	速小太刀
+Kunai	くない
+Stealth Knife	ステルスナイフ
+Balisong	バタフライナイフ
+Erudite Vector	学究的ベクトル
+Ritual Dagger	儀式用短剣
+Assassin Tanto	暗殺者タント
+Kingsguard	キングズガード
+Cloudwalker Chakram	雲歩く者のチャクラ
+Fishmonger	魚屋
+Troll Tooth	トロールの牙
+Levia Fang	レヴィアファング
+Misericordia	ミゼリコルディア
+Sultan Dagger	サルタンの短剣
+Luxurious Poignard	豪華なポワニャール
+Ceremonial Katar	儀礼用のカタール
+Nightmare Fellblade	悪夢のフェルブレード
+Swan's Edge	白鳥の刃
+Lucky Strike	ラッキーな一撃
+Heartseeker	ハートシーカー
+Last Breath	ラストブレス
+Cudgel	こん棒
+Spiked Cudgel	トゲ棍棒
+Darkwood Branch	ダークウッドの枝
+Warhammer	ウォーハンマー
+Liberty Mace	自由のメイス
+Morning Star	モーニングスター
+Inflatable Maul	ピコピコアックス
+Flanged Mace	フランジドメイス
+Skull Crusher	スカルクラッシャー
+Evening Star	イブニングスター
+Meteor Hammer	メテオハンマー
+Powder Keg	火薬樽
+Whack-O'-Lantern	スマッシュ・オー・ランタン
+Peppermint Mallet	ペパーミントハンマー
+Tenderizer	テンダライザー
+Wallace Mallet	ウォレスのハンマー
+Striped Star	ストライプスター
+Nautilus	ノーチラス
+Opulent Maul	贅沢な斧
+Mundra's Masher	ムンドラの鉄槌
+Thorium Hammer	トリウムハンマー
+Sunglow Impact	サングローインパクト
+Gaia Maul	ガイアの斧
+Javelin	ジャベリン
+Hunting Spear	ハンティングスピアー
+Bladed Spear	薙刀
+Sturdy Pitchfork	頑丈な熊手
+Ranseur	ランサー
+Trishula	トリシューラ
+Warlord Halberd	ウォーマスターハルバード
+Spetum	スペタム
+Triton Lance	トリトンランス
+Cu Chulainn's Lance	クー・フーリンの槍
+Royal Halberd	ロイヤルハルバード
+Champion Lance	チャンピオンランス
+Wyvern Glaive	ワイバーングレイブ
+Hoartooth Lance	ホアトゥースランス
+Luxurious Spear	豪華な槍
+Stellaria	ハコベ
+Longinus	ロンギヌス
+Birdbane Halberd	バードベインハルバード
+Titania's Gift	タイタニアのギフト
+Training Bow	トレーニングボウ
+Tailwind	追い風の弓
+Elmwood Bow	エルムウッドボウ
+Reflex Bow	リフレックスボウ
+Grand Harp	大きなハープ
+Compound Bow	コンパウンドボウ
+Mundra's Hornbow	ムンドラの角弓
+Deadeye	デッドアイ
+Raptoria	ラプトリア
+Quetzalcoatl	ケツァルコアトル
+L'Arabesque	アラベスク
+Yumi	和弓
+Cupid Bow	キューピッドの弓
+Bramblebane	ブランブルベイン
+Maplewood Gale	メイプルウッドの疾風
+Gemini Strike	ジェミニの一撃
+Jolly Ranger	陽気なレンジャー
+Stormrend	大嵐
+Opulent Longbow	贅沢な大弓
+Pinata Hunter	ピニャータハンター
+Carved Branch	彫刻された杖
+Sturdy Cane	丈夫な杖
+Oak Staff	オーク材の杖
+Owl Perch	フクロウの止まり木
+Luxurious Stick	豪華な杖
+Bo Staff	棒術用の杖
+Apprentice Staff	見習い魔術師の杖
+Jade Scepter	翡翠の笏
+Amber Staff	琥珀の杖
+Wizard Staff	魔法使いの杖
+Staff of Seasons	季節の杖
+Celestial Staff	天上の杖
+Mundra's Scepter	ムンドラの王笏
+Imperial Aquila	帝国のワシの杖
+Phoenix Staff	フェニックスの杖
+Transcendence	トランセンダンス
+Tidebringer	タイドブリンガー
+Zesty Scepter	刺激の笏
+Seraphim	セラフィム
+Staff of Merriment	陽気な杖
+Penumbra	反影
+Baton	バトン
+Elvenwood Wand	エルフの森のワンド
+Hexer's Wand	ヘクサーのワンド
+Steel Rod	銅の延べ棒
+Star Rod	星の延べ棒
+Peppermint Cane	ペパーミントステッキ
+Sylvanel	シルヴァネル
+Ruby Wand	ルビーワンド
+Owl Wing Wand	フクロウの翼のワンド
+Wand of Midas	ミダスのワンド
+Evergreen Wand	常緑樹のワンド
+Equinox Rod	イクイナクスロッド
+Astral Conductor	星の指揮者
+Grimar's Grand Wand	グリマールの大きなワンド
+Draconic Eyestalk	ドラゴンの眼柄
+Light Crossbow	ライトクロスボウ
+Hand Crossbow	ハンドクロスボウ
+Arbalest	アルバレスト
+Heavy Crossbow	ヘビークロスボウ
+Cluckthrower	クラックスロー
+Hunter's Crossbow	狩人のクロスボウ
+Scorpio	スコルピウス
+Double Crossbow	ダブルクロスボウ
+Chu-Ko-Nu	連弩
+Dra-Ko-Nu	ドラコヌ
+Triple Crossbow	トリプルクロスボウ
+Super Repeater	スーパーリピーター
+Nightwing	夜の翼
+Leviathan	レビヤタン
+Pellet Gun	ペレット銃
+Handgun	拳銃
+Smoothbore	滑腔銃
+Long Rifle	ロングライフル
+Snowball Launcher	雪玉ランチャー
+Blunderbuss	らっぱ銃
+Boomstick	ショットガン
+Kenora Mk. IV	ケノラMK五世
+Prototype Gatling	プロトタイプガトリング
+Dragonator	ドラゴネーター
+Handcask '65	ハンドカスク’65
+The Messenger	メッセンジャー
+Oxen Impact	オックスインパクト
+Omega Disintegrator	オメガディスインテグレータ
+Mintyleaf Herb	ミントのハーブ
+Sweet Grass	スイートグラス
+Moon Powder	ムーンパウダー
+Magical Mistletoe	魔法のミスルトウ
+Healing Salve	回復の軟膏
+Venerable Oats	由緒正しいオーツ
+Silver Thistle	ギンアザミ
+Bountiful Harvest	豊富な収穫
+Bloodvine	ブラッドヴァイン
+Fragrant Bouquet	香り高いブーケ
+Mandragoroot	マンドラゴールート
+Wolf's Bane	トリカブト
+Mistpeak Bloom	霧峰草
+Yggdrasil Branch	ユグドラシルの枝
+Luckiest Clover	幸運のクローバー
+Luxurious Panacea	豪華な治療薬
+Wyrmblood Ointment	ウィルムブラッドの軟膏
+Wild Oak Rose	野生のオークローズ
+Florae Daemonica	フローレデモニカ
+Bleakspire Roots	ブリークスパイアの根
+Warm Tea	暖かいお茶
+Healing Potion	回復ポーション
+Magic Potion	魔法ポーション
+Science Project	科学研究
+XL Healing Potion	特大回復ポーション
+Elegant Tea Set	エレガントなティーセット
+XL Magic Potion	特大魔法ポーション
+Old Salt's Brew	ベテラン船乗りの薬
+Phoenix Tonic	フェニックストニック
+Zesty Granita	辛いグラニータ
+Potion of Renewal	復活のポーション
+Bottled Mirth	喜びのボトル
+Purple Bomb	パープルボム
+Gourd Elixir	ひょうたんの霊薬
+Soulfire Extract	ソウルファイア・エクストラクト
+Tangy Decoction	すっぱい煎じ薬
+Oak Essence	オークのエッセンス
+Gaia Tonic	ガイアトニック
+Midnight Oil	真夜中のオイル
+Opulent Elixir	贅沢な霊薬
+Distilled Nebula	蒸留された星雲
+Scroll of Sparks	火花の巻物
+Scroll of Cleansing	浄化の巻物
+Scroll of Armor	装甲の巻物
+Scroll of Storms	嵐の巻物
+Song of Valor	勇気の歌
+Correspondence	文書通信
+Monster Manual	モンスターマニュアル
+Tome of the Night	夜の書
+Tome of Knowledge	知識の書
+Tome of Secrets	秘密の書
+Naughty or Nice List	良い子と悪い子のリスト
+Bagua Board	八卦の板
+Firework Bundle	花火の束
+Tarot Deck	タロットデッキ
+Scroll of Fortune	幸運の巻物
+Grimoire Aeternum	グリモア・アエテルヌム
+Imperial Decree	皇帝の判決
+Luxurious Tablet	豪華な書き板
+Ancestral Atlas	先祖のアトラス
+Prayer Book	祈禱書
+Druidic Grimoire	ドルイドのグリモア
+Celestial Choir	天上の聖歌隊
+Phoenix Litany	フェニックスの連祷
+Tome of All-Knowledge	英知の書
+Breastplate	鎧
+Iron Mail	アイアンメイル
+Scale Armor	スケイルアーマー
+Hauberk	鎖かたびら
+Knight Breastplate	騎士の胸当て
+Ceremonial Breastplate	儀礼用の胸当て
+Centurion Armor	センチュリオンのアーマー
+Paladin Plate	パラディンプレート
+Hive Guard Plate	巣の番人プレート
+Samurai Do	サムライ道
+Brinewater Do	深水の胴丸
+Warlord Plate	ウォーマスターの鎧
+General Plate	将軍プレート
+Landsknecht Plate	ランツクネヒトプレート
+Berserker Armor	狂戦士のアーマー
+Gaia Enforcer	ガイアのエンフォーサー
+Star-Spangled Plate	星条旗プレート
+Juggernaut Fortress	ジャガーノートの要塞
+Amber Citadel	琥珀の要塞都市
+Opulent Breastplate	贅沢な胸当て
+Milesian Mail	ミレトスの鎧
+Celesteel Plate	セレスティール・プレート
+Leather Armor	レザーアーマー
+Gambeson	ギャンベゾン
+Doublet	ダブレット
+Studded Armor	スタッドアーマー
+Blizzard Armor	ブリザードアーマー
+Hide Armor	ハイドアーマー
+Mundra's Tabard	ムンドラのタバード
+Savage Garb	サヴェージガーブ
+Glade Guard Armor	森の守り手の鎧
+Pumpkin Armor	パンプキンアーマー
+Ninja Garb	忍者ガーブ
+Night Armor	夜の鎧
+Windrunner Armor	ウィンドランナーアーマー
+Drakeskin Armor	ドレイクスキンアーマー
+Smith Attire	鍛冶屋の衣装
+Corsair Mantle	コルセアのマント
+Swan's Garment	白鳥の衣服
+Cloudwalker Armor	雲行く者のアーマー
+Everdusk Lord Attire	エバーダスク貴族の衣装
+Opulent Armor	贅沢なアーマー
+Shirt	シャツ
+Black Robe	黒のローブ
+Druid's Robe	ドルイドのローブ
+Disciple's Robe	使徒のローブ
+Scholar's Tunic	学者のチュニック
+Explorer's Outfit	探検者の衣装
+Tailor Mantle	仕立て屋のマント
+Witch's Outfit	魔女の衣装
+Vestal Raiments	純潔の服
+Wizard Attire	魔法使いの衣装
+Midnight Apparel	真夜中の服装
+Shaman Vestment	シャーマンの祭服
+Luxurious Attire	豪華な衣装
+Astravestimenta	アストラベスティメンタ
+Ostara Vest	オスタラベスト
+Desert Threads	砂漠の糸筋
+Archmage Raiments	アークマジックの衣装
+Republic Garments	共和国の衣装
+Djinn Robes	ジンのローブ
+Sturdy Cap	丈夫な帽子
+Warrior Helmet	戦士のヘルメット
+Horned Helm	角兜
+Raider Helm	レイダーヘルム
+Knight Heaume	騎士の兜
+Brinewater Helm	深水の兜
+Eagle Helm	イーグルヘルム
+Paladin Helm	パラディンヘルム
+Kodiak Helmet	ゴディアックのヘルメット
+Samurai Kabuto	サムライのかぶと
+Gladiator Helm	グラディエーターヘルム
+General Heaume	将軍の大兜
+Crusader Helmet	クルセイダーヘルメット
+Warlord Helmet	ウォーマスターの兜
+Berserker Helmet	狂戦士のヘルメット
+Centurion Helmet	センチュリオンのヘルメット
+Juggernaut Furnace	ジャガーノートのかまど
+Gobble Lord Helm	貪欲な貴族の兜
+Opulent Heaume	贅沢な大兜
+Celesteel Heaume	セレスティールの兜
+Leather Cap	レザーキャップ
+Canopy Cap	キャノピーキャップ
+Brimmed Hat	つば付き帽
+Feathered Hat	羽根帽子
+Tricorn	三角帽子
+Silk Hood	シルクのフード
+Santa's Elf Hat	サンタの小人の帽子
+Pirate Hat	海賊の帽子
+Lovely Hat	ラブリーな帽子
+Night Cowl	夜のフード
+Nomad Veil	遊牧民のベール
+Harvester's Hood	収穫用のフード
+Windrunner Hat	ウィンドランナーの帽子
+Drakeskin Mask	ドレイクの仮面
+Storm Dragon Mask	ストームドラゴンの仮面
+Grand Tyrolean	グランドチロリアン
+Corsair Tricorn	コルセアの三角帽
+Republic Coiffe	共和国コイフ
+Everdusk Cowl	エバーダスクのフード
+Abyssal Hood	深淵のフード
+Rogue Sombrero	ローグのソンブレロ
+Stitched Cone	ステッチされたコーン
+Black Cowl	黒のフード
+Druid Laurels	ドルイドの月桂樹
+Apprentice Tiara	見習い魔術師のティアラ
+Bronze Circlet	ブロンズのサークレット
+Wizard Hat	魔法使いの帽子
+Hat of the Four Winds	4つ風の帽子
+Ostara Hat	オスタラハット
+Witch Hat	魔女帽子
+Owl Cowl	フクロウのフード
+Tactician Hat	戦術家の帽子
+Summoner Hat	召喚術師の帽子
+Shaman Hat	シャーマンの帽子
+Luxurious Headdress	豪華なヘッドドレス
+Astral Hat	星の帽子
+Raven Mask	レイヴンの仮面
+Spellward Hat	魔除けの帽子
+Opal Diadem	オパールの王冠
+Night Crown	夜の王冠
+Djinn Veil	ジンのベール
+Elegant Top Hat	エレガントな帽子
+Iron Armguards	鉄のアームガード
+Plated Gauntlets	プレートガントレット
+Warrior Gauntlets	戦士のガントレット
+Demi Gauntlets	デミ・ガントレット
+Pumpkin Gauntlets	パンプキンガントレット
+Knight Gauntlets	騎士のガントレット
+Paladin Gauntlets	パラディンのガントレット
+Sungrasp Gauntlets	サングラスプ・ガントレット
+Landsknecht Gauntlets	ランツクネヒトガントレット
+Samurai Kote	サムライのこて
+Republic Gauntlets	共和国ガントレット
+General Gauntlets	将軍のガントレット
+Berserker Gauntlets	狂戦士のガントレット
+Luxurious Gauntlets	豪華なガントレット
+Juggernaut Grip	ジャガーノートのグリップ
+Winter's Touch	ウィンタータッチ
+Celesteel Gauntlets	セレスティール・ガントレット
+Gaia's Hold	ガイアの一握り
+Leather Gloves	革の手袋
+Bracers	ブレイサー
+Thief's Gloves	盗賊の手袋
+Swift Mitts	迅速のミット
+Patchleather Bracers	つぎはぎ革のブレイサー
+Studded Gloves	スタッドグローブ
+Elven Vambraces	エルフの腕甲
+Ostara Gloves	オスタラグローブ
+Savage Claws	サヴェージクロー
+Black Wyrm Claws	ブラックワームの爪
+Ninja Gloves	忍者の手袋
+Windrunner Gloves	ウィンドランナーの手袋
+Drakeskin Gloves	ドレイクスキンの手袋
+Mountain Man Mitts	山男の手袋
+Corsair Gloves	コルセアの手袋
+Fortunate Gloves	幸運の手袋
+Opulent Grasp	贅沢な手袋
+Everdusk Gloves	エバーダスクの手袋
+Raptor Wings	猛禽類の翼
+Shin Guards	すね当て
+Long Boots	ロングブーツ
+Iron Greaves	鉄のすね当て
+Hero's Boots	ヒーローのブーツ
+Reinforced Greaves	強化すね当て
+Knight Sollerets	騎士の鉄靴
+Cindersole	燃えがらのブーツ
+Paladin Boots	パラディンの靴
+Samurai Haidate	サムライのはいだて
+General Greaves	将軍のすね当て
+Berserker Stompers	狂戦士の厚底靴
+Luxurious Boots	豪華なブーツ
+Vanguard Greaves	先駆者のすね当て
+Juggernaut Greaves	ジャガーノートのすね当て
+Bunbun Booties	バンバンブーティーズ
+Celesteel Boots	セレスティール・ブーツ
+Leather Boots	レザーブーツ
+Trailblazers	トレイルブレイザー
+Flip-Flops	ビーチサンダル
+Soft Shoes	ソフトシューズ
+Legionnaire Sandals	軍団兵のサンダル
+Thief's Shoes	シーフの靴
+Perennial Sandals	とこしえのサンダル
+Elven Shoes	エルフの靴
+Savage Stride	サヴェージストライド
+Sultan Steps	サルタンの靴
+Ninja Tabi	忍者の足袋
+Windrunner Boots	ウィンドランナーのブーツ
+Alpine Stride	アルペンストライダー
+Drakeskin Boots	ドレイクスキンのブーツ
+Plaguewalkers	プレイグウォーカー
+Shoes of Style	流行のシューズ
+Corsair Boots	コルセアのブーツ
+Cloudwalker Steps	雲行く者の靴
+Everdusk Boots	エバーダスクのブーツ
+Raptor Talons	猛禽類の爪
+Wooden Shield	木の盾
+Heavy Buckler	ヘビーバックラー
+Oaken Shield	オーク材の盾
+Iron Shield	鉄の盾
+Aurum Ward	黄金の防護
+Teardrop Shield	ティアドロップシールド
+Imperial Scutum	インペリアル大型盾
+Champion Vigil	チャンピオンの夜警
+Mythril Aspis	ミスリルアスビス
+Gaia Aegis	ガイアイージス
+Wyrmguard	ウィルムガード
+Ancestor Totem	先祖のトーテム
+Angelic Pavise	エンジェルパヴィース
+Prometheon	プロメシオン
+Milesian Shield	ミトレスの盾
+Bunbun Buckler	バンバンバックラー
+Luxurious Aegis	豪華なイージス
+Goldmane Guard	ゴールドメインの守護兵
+Emperor Wyrmguard	皇帝のウィルムガード
+Bearded Paragon	あごひげを生やしたパラゴン
+Honeycomb Defender	ハニカムの防衛者
+Iron Ring	鉄リング
+Alloy Loop	合金の輪
+Ruby Ring	ルビーリング
+Emerald Ring	エメラルドリング
+Silver Band	シルバーバンド
+Ring of Passion	ハートの指輪
+Noble Ring	ノーブルリング
+Ring of Rhythm	リズムの指輪
+Knight Signet	騎士のシグネット
+Batrachite Stone	バトラカイトストーン
+Soulstone Ring	ソウルストーンリング
+Ring of the Chosen	選ばれし者の指輪
+Brimstone Coil	硫黄のらせん
+Fairfolk Band	フェアリーバンド
+Dawnflower Ring	ドーンフラワーの指輪
+Valedictorian Ring	卒業生代表の指輪
+Luxurious Signet	豪華なシグネット
+Borealis	ボレアリス
+Northwind Gem	北風のジェム
+Blizzard Ring	ブリザードリング
+Bunbun Band	バンバンバンド
+Rubicon Prison	ルビコンプリズン
+Memento	メメント
+Jade Pendant	翡翠ペンダント
+Iron Bond	アイアンボンド
+Mundra's Amulet	ムンドラのアミュレット
+Sun Pendant	サンペンダント
+Eclipse Amulet	蝕のアミュレット
+Medal of Honor	名誉のメダル
+Noble Chain	ノーブルチェーン
+Lucky Medallion	幸運のメダリオン
+Luxurious Charm	豪華なお守り
+Holy Symbol	聖なるシンボル
+Convenient Pendant	便利なペンダント
+Titanium Torc	チタントルク
+Magical Timepiece	魔法のタイムピース
+Magatama Necklace	勾玉のネックレス
+Dragonsoul Pendant	ドラゴンソウルのペンダント
+Archivist Glasses	アーキビストのゴーグル
+Stygian Phylactery	地獄のお守り
+Ursa Totem	ウルサトーテム
+Alimyriad	アリミリャド
+Freyja's Talisman	フレイヤのお守り
+VIP Talisman	VIPのお守り
+Brísingamen	ブリーシンガメン
+Monsoon Heart	モンスーンの床（ハート模様）
+Chipped Runestone	欠けた石
+Flawed Runestone	不完全な石
+Chiseled Runestone	加工された石
+Lesser Moonstone	低級ムーンストーン
+Superior Moonstone	上級ムーンストーン
+Greater Moonstone	特上級ムーンストーン
+Ember Element	燃えさしのエレメント
+Flame Element	火のエレメント
+Blaze Element	火炎のエレメント
+Bubble Element	水疱のエレメント
+Tide Element	潮のエレメント
+Flood Element	氾濫のエレメント
+Breeze Element	そよ風のエレメント
+Gale Element	強風のエレメント
+Tempest Element	嵐のエレメント
+Nature Element	自然のエレメント
+Wild Element	野生のエレメント
+Primal Element	獣性のエレメント
+Light Element	光のエレメント
+Holy Element	聖なるエレメント
+Sacred Element	神聖なエレメント
+Corrupted Element	汚染のエレメント
+Unholy Element	不浄のエレメント
+Nightmare Element	悪夢のエレメント
+Ram Spirit	牡山羊の精霊
+Wolf Spirit	狼の精霊
+Ox Spirit	雄牛の精霊
+Eagle Spirit	ワシの精霊
+Viper Spirit	毒蛇の精霊
+Cat Spirit	猫の精霊
+Rhino Spirit	サイの精霊
+Owl Spirit	フクロウの精霊
+Armadillo Spirit	アルマジロの精霊
+Lizard Spirit	トカゲの精霊
+Horse Spirit	馬の精霊
+Hippo Spirit	カバの精霊
+Shark Spirit	サメの精霊
+Walrus Spirit	セイウチの精霊
+Lion Spirit	獅子の精霊
+Bear Spirit	クマの精霊
+Mammoth Spirit	マンモスの精霊
+Dinosaur Spirit	恐竜の精霊
+Barkback's Armor	バーバックのアーマー
+Jester Jouster	ジェスタージョスター
+Primitech Slingshot	原始的なスリングショット
+Opulent Sallet	贅沢なサレット
+Plated Squeakers	プレートスクイーカー
+Star-Spangled Greaves	星条旗のすね当て
+Seltzer Surprise	セルツァーサプライズ
+Sealed Declaration	封印された宣言
+Forlorn Acorn	悲しみのどんぐり
+Troublin Bludgeon	トラブリンのこん棒
+</script>
+<script type="text/csv" id="$Item">
+Squire Sword	Sword	1	50	5	15
+Arming Sword	Sword	2	180	10	25
+Gladius	Sword	3	670	20	45
+Arboreal Blade	Sword	3	1,050	25	55
+Zweihander	Sword	3	1,250	25	60
+Cutlass	Sword	4	2,050	35	80
+Espada	Sword	5	5,900	60	130
+Hero's Sword	Sword	5	11,000	80	175
+Katana	Sword	6	24,000	115	255
+Serrated Cinquedea	Sword	6	38,500	145	320
+Regal Blade	Sword	7	64,500	180	405
+Celesteel Blade	Sword	8	195,000	310	690
+Damocles	Sword	8	220,000	330	735
+Luxurious Macuahuitl	Sword	8	365,000	315	700
+Mythril Edge	Sword	9	300,000	385	850
+Gentleman Blade	Sword	9	395,000	435	970
+Seafarer Blade	Sword	9	420,000	450	1,000
+Oversized Cleaver	Sword	10	605,000	805	1,790
+Caladbolg	Sword	10	630,000	820	1,825
+Dragon Dao	Sword	10	650,000	835	1,850
+Vorpal Sword	Sword	11	1,400,000	1,045	2,320
+Elegant Rapier	Sword	11	1,500,000	1,080	2,395
+Wood Axe	Axe	1	310	15	30
+Hatchet	Axe	2	710	20	45
+Iron Chopper	Axe	3	1,300	25	60
+Explorer's Axe	Axe	3	1,750	30	70
+Bardiche	Axe	4	4,500	50	115
+Molten Voulge	Axe	4	5,250	55	120
+Tomahawk	Axe	5	10,000	75	165
+Companion Axe	Axe	5	12,000	80	180
+Battleaxe	Axe	6	24,000	115	255
+Raptor Reaper	Axe	6	40,500	145	325
+Dwarven Greataxe	Axe	7	69,000	190	420
+Stonesplitter	Axe	7	86,500	210	470
+Raider Axe	Axe	8	210,000	320	715
+Executioner	Axe	9	285,000	375	830
+Purgatory	Axe	9	360,000	420	930
+Axe of The Fifth	Axe	9	415,000	450	995
+Eclipsis	Axe	10	645,000	830	1,845
+Terra Tyrannis	Axe	10	680,000	850	1,890
+Kodiak Kleaver	Axe	10	685,000	855	1,900
+Opulent Grandaxe	Axe	10	1,650,000	975	2,170
+Manticore Slayer	Axe	11	1,450,000	1,060	2,355
+Beeswaxe	Axe	11	1,700,000	1,145	2,545
+Shiv	Dagger	1	45	5	10
+Ice Pick	Dagger	1	330	15	30
+Swift Blade	Dagger	2	260	15	30
+Kunai	Dagger	2	660	20	45
+Stealth Knife	Dagger	3	720	20	45
+Balisong	Dagger	4	3,650	45	105
+Erudite Vector	Dagger	4	6,600	60	135
+Ritual Dagger	Dagger	5	6,950	65	140
+Assassin Tanto	Dagger	5	15,000	90	200
+Kingsguard	Dagger	6	20,500	105	235
+Cloudwalker Chakram	Dagger	6	31,500	130	290
+Fishmonger	Dagger	7	69,500	190	420
+Troll Tooth	Dagger	8	170,000	295	650
+Levia Fang	Dagger	8	205,000	320	710
+Misericordia	Dagger	9	285,000	375	830
+Sultan Dagger	Dagger	9	410,000	445	990
+Luxurious Poignard	Dagger	9	520,000	375	835
+Ceremonial Katar	Dagger	10	500,000	735	1,630
+Nightmare Fellblade	Dagger	10	550,000	770	1,710
+Swan's Edge	Dagger	10	570,000	785	1,740
+Lucky Strike	Dagger	10	615,000	810	1,800
+Heartseeker	Dagger	11	1,200,000	970	2,155
+Last Breath	Dagger	11	1,300,000	1,005	2,235
+Cudgel	Mace	1	50	5	15
+Spiked Cudgel	Mace	2	220	10	25
+Darkwood Branch	Mace	2	530	20	40
+Warhammer	Mace	3	630	20	45
+Liberty Mace	Mace	3	1,000	25	55
+Morning Star	Mace	4	2,700	40	90
+Inflatable Maul	Mace	4	4,600	50	115
+Flanged Mace	Mace	5	6,200	60	130
+Skull Crusher	Mace	6	21,000	110	240
+Troublin Bludgeon	Mace	6	40,500	145	325
+Evening Star	Mace	7	61,500	180	400
+Meteor Hammer	Mace	7	84,500	210	465
+Powder Keg	Mace	8	185,000	305	675
+Whack-O'-Lantern	Mace	8	240,000	345	765
+Peppermint Mallet	Mace	8	260,000	360	795
+Tenderizer	Mace	9	290,000	375	835
+Wallace Mallet	Mace	9	410,000	445	990
+Striped Star	Mace	9	420,000	450	1,000
+Nautilus	Mace	10	630,000	820	1,825
+Opulent Maul	Mace	10	1,300,000	870	1,935
+Mundra's Masher	Mace	10	670,000	845	1,880
+Thorium Hammer	Mace	11	1,350,000	1,025	2,280
+Sunglow Impact	Mace	11	1,550,000	1,095	2,435
+Gaia Maul	Mace	11	1,700,000	1,145	2,545
+Javelin	Spear	1	190	10	25
+Hunting Spear	Spear	2	520	20	40
+Bladed Spear	Spear	3	1,400	30	65
+Sturdy Pitchfork	Spear	3	2,400	40	85
+Ranseur	Spear	4	4,850	55	120
+Trishula	Spear	5	11,500	80	180
+Warlord Halberd	Spear	5	23,500	115	250
+Spetum	Spear	6	29,000	125	275
+Triton Lance	Spear	6	34,500	135	300
+Cu Chulainn's Lance	Spear	6	54,000	170	375
+Royal Halberd	Spear	7	90,000	215	480
+Champion Lance	Spear	8	180,000	300	665
+Wyvern Glaive	Spear	9	290,000	375	835
+Hoartooth Lance	Spear	9	420,000	450	1,000
+Luxurious Spear	Spear	9	600,000	400	890
+Stellaria	Spear	10	605,000	805	1,790
+Longinus	Spear	10	655,000	835	1,855
+Birdbane Halberd	Spear	10	675,000	850	1,885
+Titania's Gift	Spear	11	1,200,000	970	2,155
+Jester Jouster	Spear	11	1,600,000	1,110	2,470
+Training Bow	Bow	1	220	10	25
+Tailwind	Bow	1	410	15	35
+Elmwood Bow	Bow	2	290	15	30
+Reflex Bow	Bow	3	1,150	25	60
+Grand Harp	Bow	3	2,350	40	85
+Compound Bow	Bow	4	2,800	40	90
+Mundra's Hornbow	Bow	4	9,700	75	165
+Deadeye	Bow	5	8,300	70	150
+Raptoria	Bow	6	27,000	120	270
+Quetzalcoatl	Bow	6	38,500	145	320
+L'Arabesque	Bow	7	72,500	195	430
+Yumi	Bow	8	190,000	310	685
+Cupid Bow	Bow	8	245,000	345	770
+Bramblebane	Bow	9	305,000	385	860
+Maplewood Gale	Bow	9	425,000	450	1,005
+Gemini Strike	Bow	10	630,000	820	1,825
+Jolly Ranger	Bow	10	655,000	835	1,855
+Stormrend	Bow	11	1,500,000	1,080	2,395
+Pinata Hunter	Bow	11	1,750,000	1,160	2,580
+Opulent Longbow	Bow	11	2,900,000	1,110	2,470
+Carved Branch	Staff	1	60	5	15
+Sturdy Cane	Staff	2	200	10	25
+Oak Staff	Staff	3	710	20	45
+Owl Perch	Staff	3	1,950	35	75
+Luxurious Stick	Staff	3	10,000	55	125
+Bo Staff	Staff	4	2,800	40	90
+Apprentice Staff	Staff	4	4,800	50	115
+Jade Scepter	Staff	5	9,500	70	160
+Amber Staff	Staff	5	13,000	85	190
+Wizard Staff	Staff	6	32,500	135	295
+Staff of Seasons	Staff	6	45,000	155	340
+Celestial Staff	Staff	7	60,500	180	395
+Mundra's Scepter	Staff	7	77,000	200	445
+Imperial Aquila	Staff	8	180,000	300	665
+Phoenix Staff	Staff	8	210,000	320	715
+Transcendence	Staff	9	300,000	385	850
+Tidebringer	Staff	9	365,000	420	935
+Zesty Scepter	Staff	9	430,000	455	1,010
+Seraphim	Staff	10	645,000	830	1,845
+Staff of Merriment	Staff	10	675,000	850	1,885
+Penumbra	Staff	11	1,400,000	1,045	2,320
+Baton	Wand	1	350	15	35
+Elvenwood Wand	Wand	2	1,400	30	65
+Hexer's Wand	Wand	3	3,250	45	95
+Steel Rod	Wand	4	7,650	65	145
+Star Rod	Wand	5	18,500	100	225
+Peppermint Cane	Wand	5	20,000	105	230
+Sylvanel	Wand	6	53,500	165	370
+Ruby Wand	Wand	7	100,000	225	500
+Owl Wing Wand	Wand	7	105,000	230	515
+Wand of Midas	Wand	8	245,000	345	770
+Evergreen Wand	Wand	9	345,000	410	910
+Equinox Rod	Wand	9	400,000	440	975
+Astral Conductor	Wand	10	665,000	840	1,870
+Grimar's Grand Wand	Wand	10	700,000	865	1,920
+Draconic Eyestalk	Wand	11	1,700,000	1,145	2,545
+Light Crossbow	Crossbow	1	210	10	25
+Hand Crossbow	Crossbow	2	560	20	40
+Arbalest	Crossbow	3	2,000	35	75
+Heavy Crossbow	Crossbow	4	5,650	55	125
+Cluckthrower	Crossbow	4	9,050	70	160
+Hunter's Crossbow	Crossbow	5	15,500	90	205
+Scorpio	Crossbow	6	35,000	135	305
+Primitech Slingshot	Crossbow	6	56,500	170	380
+Double Crossbow	Crossbow	7	130,000	255	570
+Chu-Ko-Nu	Crossbow	8	210,000	320	715
+Dra-Ko-Nu	Crossbow	8	230,000	340	750
+Triple Crossbow	Crossbow	9	355,000	415	925
+Super Repeater	Crossbow	10	655,000	835	1,855
+Nightwing	Crossbow	10	690,000	855	1,905
+Leviathan	Crossbow	11	1,900,000	1,210	2,685
+Pellet Gun	Gun	1	400	15	35
+Handgun	Gun	2	840	25	50
+Smoothbore	Gun	3	2,450	40	85
+Long Rifle	Gun	4	9,200	70	160
+Snowball Launcher	Gun	4	11,500	80	180
+Blunderbuss	Gun	5	21,000	110	240
+Boomstick	Gun	6	46,000	155	345
+Kenora Mk. IV	Gun	7	110,000	235	525
+Prototype Gatling	Gun	8	210,000	320	715
+Dragonator	Gun	9	370,000	425	940
+Handcask '65	Gun	9	425,000	450	1,005
+The Messenger	Gun	10	665,000	840	1,870
+Oxen Impact	Gun	10	675,000	850	1,885
+Omega Disintegrator	Gun	11	1,700,000	1,145	2,545
+Opulent Pistol	Gun	11	3,400,000	1,200	2,665
+Mintyleaf Herb	Herbal Medicine	1	180	10	25
+Sweet Grass	Herbal Medicine	2	700	20	45
+Moon Powder	Herbal Medicine	3	2,350	40	85
+Magical Mistletoe	Herbal Medicine	3	3,150	45	95
+Healing Salve	Herbal Medicine	4	4,100	50	110
+Venerable Oats	Herbal Medicine	4	8,650	70	155
+Silver Thistle	Herbal Medicine	5	10,000	75	165
+Bountiful Harvest	Herbal Medicine	5	16,000	95	210
+Bloodvine	Herbal Medicine	6	24,500	115	255
+Fragrant Bouquet	Herbal Medicine	6	37,000	140	310
+Mandragoroot	Herbal Medicine	7	68,500	190	420
+Wolf's Bane	Herbal Medicine	8	180,000	300	665
+Mistpeak Bloom	Herbal Medicine	8	215,000	325	725
+Yggdrasil Branch	Herbal Medicine	9	305,000	385	860
+Luckiest Clover	Herbal Medicine	9	370,000	425	940
+Luxurious Panacea	Herbal Medicine	9	595,000	400	885
+Wyrmblood Ointment	Herbal Medicine	10	635,000	825	1,830
+Wild Oak Rose	Herbal Medicine	10	650,000	835	1,850
+Florae Daemonica	Herbal Medicine	11	1,300,000	1,005	2,235
+Bleakspire Roots	Herbal Medicine	11	1,550,000	1,095	2,435
+Seltzer Surprise	Herbal Medicine	11	1,700,000	1,145	2,545
+Warm Tea	Potion	1	280	15	30
+Healing Potion	Potion	2	980	25	55
+Magic Potion	Potion	3	3,850	45	105
+Science Project	Potion	3	4,050	50	110
+XL Healing Potion	Potion	4	7,000	65	140
+Elegant Tea Set	Potion	4	12,000	80	180
+XL Magic Potion	Potion	5	13,500	85	190
+Old Salt's Brew	Potion	5	25,000	115	260
+Phoenix Tonic	Potion	6	31,500	130	290
+Zesty Granita	Potion	6	54,500	170	375
+Potion of Renewal	Potion	7	72,500	195	430
+Bottled Mirth	Potion	7	94,000	220	490
+Purple Bomb	Potion	8	190,000	310	685
+Gourd Elixir	Potion	8	225,000	335	740
+Soulfire Extract	Potion	9	295,000	380	845
+Tangy Decoction	Potion	9	405,000	445	985
+Oak Essence	Potion	9	410,000	445	990
+Gaia Tonic	Potion	10	620,000	815	1,810
+Midnight Oil	Potion	10	645,000	830	1,845
+Opulent Elixir	Potion	10	1,550,000	950	2,110
+Distilled Nebula	Potion	11	1,600,000	1,110	2,470
+Scroll of Sparks	Spell	1	320	15	30
+Scroll of Cleansing	Spell	1	690	20	45
+Scroll of Armor	Spell	2	1,050	25	55
+Scroll of Storms	Spell	3	2,750	40	90
+Song of Valor	Spell	4	6,900	65	140
+Correspondence	Spell	4	13,500	85	190
+Monster Manual	Spell	5	15,000	90	200
+Tome of the Night	Spell	5	20,500	105	235
+Tome of Knowledge	Spell	5	22,000	110	245
+Tome of Secrets	Spell	6	32,500	135	295
+Naughty or Nice List	Spell	6	44,500	155	340
+Bagua Board	Spell	7	71,000	190	425
+Firework Bundle	Spell	7	115,000	240	535
+Tarot Deck	Spell	8	195,000	310	690
+Scroll of Fortune	Spell	8	225,000	335	740
+Grimoire Aeternum	Spell	9	320,000	395	880
+Imperial Decree	Spell	9	425,000	450	1,005
+Luxurious Tablet	Spell	9	610,000	405	895
+Ancestral Atlas	Spell	10	620,000	815	1,810
+Prayer Book	Spell	10	655,000	835	1,855
+Druidic Grimoire	Spell	10	705,000	865	1,925
+Celestial Choir	Spell	11	1,400,000	1,045	2,320
+Phoenix Litany	Spell	11	1,550,000	1,095	2,435
+Sealed Declaration	Spell	11	1,600,000	1,110	2,470
+Tome of All-Knowledge	Spell	11	2,000,000	1,240	2,750
+Breastplate	Heavy Armor	1	60	5	15
+Iron Mail	Heavy Armor	2	430	15	35
+Scale Armor	Heavy Armor	3	1,600	30	70
+Hauberk	Heavy Armor	4	3,650	45	105
+Knight Breastplate	Heavy Armor	5	8,450	70	155
+Ceremonial Breastplate	Heavy Armor	5	11,500	80	180
+Centurion Armor	Heavy Armor	5	19,000	100	225
+Paladin Plate	Heavy Armor	6	23,500	115	250
+Hive Guard Plate	Heavy Armor	6	34,500	135	300
+Samurai Do	Heavy Armor	7	84,000	205	460
+Brinewater Do	Heavy Armor	7	105,000	230	515
+Warlord Plate	Heavy Armor	7	165,000	290	640
+General Plate	Heavy Armor	8	185,000	305	675
+Landsknecht Plate	Heavy Armor	8	225,000	335	740
+Berserker Armor	Heavy Armor	9	310,000	390	865
+Gaia Enforcer	Heavy Armor	9	365,000	420	935
+Star-Spangled Plate	Heavy Armor	9	425,000	450	1,005
+Juggernaut Fortress	Heavy Armor	10	610,000	810	1,795
+Amber Citadel	Heavy Armor	10	640,000	825	1,835
+Milesian Mail	Heavy Armor	10	685,000	855	1,900
+Opulent Breastplate	Heavy Armor	10	1,500,000	935	2,075
+Celesteel Plate	Heavy Armor	11	1,550,000	1,095	2,435
+Leather Armor	Light Armor	1	60	5	15
+Gambeson	Light Armor	2	190	10	25
+Doublet	Light Armor	3	1,100	25	60
+Studded Armor	Light Armor	4	2,500	40	85
+Blizzard Armor	Light Armor	4	6,000	60	130
+Hide Armor	Light Armor	5	8,900	70	155
+Mundra's Tabard	Light Armor	5	16,500	95	210
+Savage Garb	Light Armor	6	24,500	115	255
+Glade Guard Armor	Light Armor	6	33,500	135	295
+Pumpkin Armor	Light Armor	6	39,500	145	320
+Ninja Garb	Light Armor	7	86,000	210	465
+Night Armor	Light Armor	7	115,000	240	535
+Windrunner Armor	Light Armor	8	205,000	320	710
+Drakeskin Armor	Light Armor	9	320,000	395	880
+Smith Attire	Light Armor	9	425,000	450	1,005
+Corsair Mantle	Light Armor	10	600,000	800	1,780
+Swan's Garment	Light Armor	10	655,000	835	1,855
+Cloudwalker Armor	Light Armor	10	680,000	850	1,890
+Everdusk Lord Attire	Light Armor	11	1,400,000	1,045	2,320
+Barkback's Armor	Light Armor	11	1,650,000	1,130	2,510
+Opulent Armor	Light Armor	11	3,000,000	1,125	2,505
+Shirt	Clothes	1	50	5	15
+Black Robe	Clothes	2	280	15	30
+Druid's Robe	Clothes	3	1,100	25	60
+Disciple's Robe	Clothes	4	2,550	40	85
+Scholar's Tunic	Clothes	5	8,800	70	155
+Explorer's Outfit	Clothes	5	15,000	90	200
+Tailor Mantle	Clothes	5	21,500	110	240
+Witch's Outfit	Clothes	6	24,000	115	255
+Vestal Raiments	Clothes	6	37,500	140	315
+Wizard Attire	Clothes	6	40,500	145	325
+Midnight Apparel	Clothes	7	70,000	190	425
+Shaman Vestment	Clothes	8	190,000	310	685
+Luxurious Attire	Clothes	8	400,000	330	730
+Astravestimenta	Clothes	9	335,000	405	900
+Ostara Vest	Clothes	9	385,000	430	960
+Desert Threads	Clothes	9	410,000	445	990
+Archmage Raiments	Clothes	10	595,000	800	1,775
+Republic Garments	Clothes	10	620,000	815	1,810
+Djinn Robes	Clothes	11	1,350,000	1,025	2,280
+Sturdy Cap	Helmet	1	60	5	15
+Warrior Helmet	Helmet	2	350	15	35
+Horned Helm	Helmet	3	1,250	25	60
+Raider Helm	Helmet	4	3,200	45	95
+Knight Heaume	Helmet	5	9,450	70	160
+Brinewater Helm	Helmet	5	13,500	85	190
+Eagle Helm	Helmet	5	15,000	90	200
+Paladin Helm	Helmet	6	26,000	120	265
+Kodiak Helmet	Helmet	6	37,500	140	315
+Samurai Kabuto	Helmet	7	86,000	210	465
+Gladiator Helm	Helmet	7	115,000	240	535
+General Heaume	Helmet	8	185,000	305	675
+Crusader Helmet	Helmet	8	200,000	315	700
+Warlord Helmet	Helmet	8	255,000	355	785
+Berserker Helmet	Helmet	9	325,000	400	885
+Centurion Helmet	Helmet	9	425,000	450	1,005
+Juggernaut Furnace	Helmet	10	600,000	800	1,780
+Gobble Lord Helm	Helmet	10	675,000	850	1,885
+Opulent Heaume	Helmet	10	1,650,000	975	2,170
+Celesteel Heaume	Helmet	11	1,200,000	970	2,155
+Leather Cap	Rogue Hat	1	60	5	15
+Canopy Cap	Rogue Hat	1	270	15	30
+Brimmed Hat	Rogue Hat	2	190	10	25
+Feathered Hat	Rogue Hat	3	860	25	50
+Tricorn	Rogue Hat	4	2,250	35	80
+Silk Hood	Rogue Hat	5	7,400	65	145
+Santa's Elf Hat	Rogue Hat	5	13,500	85	190
+Pirate Hat	Rogue Hat	6	24,000	115	255
+Lovely Hat	Rogue Hat	6	40,500	145	325
+Night Cowl	Rogue Hat	7	65,000	185	410
+Nomad Veil	Rogue Hat	7	93,000	220	485
+Harvester's Hood	Rogue Hat	7	120,000	250	550
+Windrunner Hat	Rogue Hat	8	185,000	305	675
+Drakeskin Mask	Rogue Hat	9	320,000	395	880
+Storm Dragon Mask	Rogue Hat	9	360,000	420	930
+Grand Tyrolean	Rogue Hat	9	435,000	455	1,015
+Corsair Tricorn	Rogue Hat	10	605,000	805	1,790
+Republic Coiffe	Rogue Hat	10	625,000	815	1,815
+Everdusk Cowl	Rogue Hat	11	1,250,000	990	2,195
+Abyssal Hood	Rogue Hat	11	1,400,000	1,045	2,320
+Rogue Sombrero	Rogue Hat	11	1,500,000	1,080	2,395
+Opulent Sallet	Rogue Hat	11	2,900,000	1,110	2,470
+Stitched Cone	Magician Hat	1	60	5	15
+Black Cowl	Magician Hat	2	190	10	25
+Druid Laurels	Magician Hat	3	690	20	45
+Apprentice Tiara	Magician Hat	3	1,950	35	75
+Bronze Circlet	Magician Hat	4	2,050	35	80
+Wizard Hat	Magician Hat	5	8,000	70	150
+Hat of the Four Winds	Magician Hat	5	11,000	80	175
+Ostara Hat	Magician Hat	5	14,000	90	195
+Witch Hat	Magician Hat	6	18,500	100	225
+Owl Cowl	Magician Hat	6	37,000	140	310
+Tactician Hat	Magician Hat	7	62,000	180	400
+Summoner Hat	Magician Hat	7	105,000	230	515
+Shaman Hat	Magician Hat	8	195,000	310	690
+Luxurious Headdress	Magician Hat	8	435,000	340	760
+Astral Hat	Magician Hat	9	325,000	400	885
+Raven Mask	Magician Hat	9	410,000	445	990
+Spellward Hat	Magician Hat	9	420,000	450	1,000
+Opal Diadem	Magician Hat	10	600,000	800	1,780
+Night Crown	Magician Hat	10	670,000	845	1,880
+Djinn Veil	Magician Hat	11	1,450,000	1,060	2,355
+Elegant Top Hat	Magician Hat	11	1,500,000	1,080	2,395
+Iron Armguards	Gauntlets	1	60	5	15
+Plated Gauntlets	Gauntlets	2	410	15	35
+Warrior Gauntlets	Gauntlets	3	1,300	25	60
+Demi Gauntlets	Gauntlets	4	4,250	50	110
+Pumpkin Gauntlets	Gauntlets	4	6,000	60	130
+Knight Gauntlets	Gauntlets	5	11,500	80	180
+Paladin Gauntlets	Gauntlets	6	22,500	110	245
+Sungrasp Gauntlets	Gauntlets	6	36,000	140	310
+Landsknecht Gauntlets	Gauntlets	6	48,000	160	355
+Samurai Kote	Gauntlets	7	69,000	190	420
+Republic Gauntlets	Gauntlets	7	82,500	205	460
+General Gauntlets	Gauntlets	8	185,000	305	675
+Berserker Gauntlets	Gauntlets	9	305,000	385	860
+Luxurious Gauntlets	Gauntlets	9	530,000	380	840
+Juggernaut Grip	Gauntlets	10	600,000	800	1,780
+Winter's Touch	Gauntlets	10	645,000	830	1,845
+Celesteel Gauntlets	Gauntlets	11	1,200,000	970	2,155
+Gaia's Hold	Gauntlets	11	1,300,000	1,005	2,235
+Leather Gloves	Gloves	1	60	5	15
+Bracers	Gloves	2	180	10	25
+Thief's Gloves	Gloves	3	720	20	45
+Swift Mitts	Gloves	3	1,200	25	60
+Patchleather Bracers	Gloves	3	2,350	40	85
+Studded Gloves	Gloves	4	3,350	45	100
+Elven Vambraces	Gloves	5	8,750	70	155
+Ostara Gloves	Gloves	5	15,500	90	205
+Savage Claws	Gloves	6	19,000	100	225
+Black Wyrm Claws	Gloves	6	29,000	125	275
+Ninja Gloves	Gloves	7	65,500	185	410
+Windrunner Gloves	Gloves	8	175,000	295	655
+Drakeskin Gloves	Gloves	9	305,000	385	860
+Mountain Man Mitts	Gloves	9	415,000	450	995
+Corsair Gloves	Gloves	10	610,000	810	1,795
+Fortunate Gloves	Gloves	10	655,000	835	1,855
+Opulent Grasp	Gloves	10	1,750,000	1,005	2,230
+Everdusk Gloves	Gloves	11	1,300,000	1,005	2,235
+Raptor Wings	Gloves	11	1,600,000	1,110	2,470
+Shin Guards	Heavy Footwear	1	55	5	15
+Long Boots	Heavy Footwear	2	230	10	25
+Iron Greaves	Heavy Footwear	3	710	20	45
+Hero's Boots	Heavy Footwear	3	1,200	25	60
+Reinforced Greaves	Heavy Footwear	4	2,150	35	80
+Plated Squeakers	Heavy Footwear	4	3,350	45	100
+Knight Sollerets	Heavy Footwear	5	8,150	70	150
+Cindersole	Heavy Footwear	5	12,000	80	180
+Paladin Boots	Heavy Footwear	6	23,500	115	250
+Samurai Haidate	Heavy Footwear	7	69,000	190	420
+General Greaves	Heavy Footwear	8	195,000	310	690
+Berserker Stompers	Heavy Footwear	9	310,000	390	865
+Luxurious Boots	Heavy Footwear	9	605,000	405	895
+Vanguard Greaves	Heavy Footwear	9	410,000	445	990
+Juggernaut Greaves	Heavy Footwear	10	625,000	815	1,815
+Bunbun Booties	Heavy Footwear	10	670,000	845	1,880
+Celesteel Boots	Heavy Footwear	11	1,250,000	990	2,195
+Star-Spangled Greaves	Heavy Footwear	11	1,650,000	1,130	2,510
+Leather Boots	Light Footwear	1	60	5	15
+Trailblazers	Light Footwear	1	250	15	30
+Flip-Flops	Light Footwear	2	180	10	25
+Soft Shoes	Light Footwear	3	660	20	45
+Legionnaire Sandals	Light Footwear	3	1,150	25	60
+Thief's Shoes	Light Footwear	4	2,800	40	90
+Perennial Sandals	Light Footwear	4	5,000	55	120
+Elven Shoes	Light Footwear	5	6,950	65	140
+Savage Stride	Light Footwear	6	20,500	105	235
+Sultan Steps	Light Footwear	6	36,500	140	310
+Ninja Tabi	Light Footwear	7	57,000	175	385
+Windrunner Boots	Light Footwear	8	175,000	295	655
+Alpine Stride	Light Footwear	8	220,000	330	735
+Drakeskin Boots	Light Footwear	9	320,000	395	880
+Plaguewalkers	Light Footwear	9	345,000	410	910
+Shoes of Style	Light Footwear	9	425,000	450	1,005
+Corsair Boots	Light Footwear	10	605,000	805	1,790
+Cloudwalker Steps	Light Footwear	10	650,000	835	1,850
+Everdusk Boots	Light Footwear	11	1,350,000	1,025	2,280
+Raptor Talons	Light Footwear	11	1,600,000	1,110	2,470
+Wooden Shield	Shield	1	110	10	20
+Heavy Buckler	Shield	2	490	20	40
+Oaken Shield	Shield	3	1,200	25	60
+Iron Shield	Shield	4	3,350	45	100
+Aurum Ward	Shield	4	6,100	60	130
+Teardrop Shield	Shield	5	9,700	75	165
+Imperial Scutum	Shield	5	14,500	90	200
+Champion Vigil	Shield	5	17,500	100	220
+Mythril Aspis	Shield	6	21,500	110	240
+Gaia Aegis	Shield	6	36,000	140	310
+Wyrmguard	Shield	7	66,000	185	410
+Ancestor Totem	Shield	8	195,000	310	690
+Angelic Pavise	Shield	9	320,000	395	880
+Prometheon	Shield	9	360,000	420	930
+Milesian Shield	Shield	9	380,000	430	955
+Bunbun Buckler	Shield	9	400,000	440	975
+Luxurious Aegis	Shield	9	600,000	400	890
+Goldmane Guard	Shield	10	610,000	810	1,795
+Emperor Wyrmguard	Shield	10	655,000	835	1,855
+Bearded Paragon	Shield	11	1,300,000	1,005	2,235
+Honeycomb Defender	Shield	11	1,700,000	1,145	2,545
+Iron Ring	Ring	1	690	20	45
+Alloy Loop	Ring	2	1,200	25	60
+Ruby Ring	Ring	3	3,350	45	100
+Emerald Ring	Ring	3	5,750	60	130
+Silver Band	Ring	4	6,850	65	140
+Ring of Passion	Ring	4	11,000	80	175
+Noble Ring	Ring	5	14,000	90	195
+Ring of Rhythm	Ring	5	20,000	105	230
+Knight Signet	Ring	6	23,500	115	250
+Ring of Liberty	Ring	6	44,500	155	340
+Batrachite Stone	Ring	7	59,000	175	390
+Soulstone Ring	Ring	7	88,500	215	475
+Ring of the Chosen	Ring	7	120,000	250	550
+Brimstone Coil	Ring	8	185,000	305	675
+Fairfolk Band	Ring	9	280,000	370	825
+Dawnflower Ring	Ring	9	380,000	430	955
+Valedictorian Ring	Ring	9	420,000	450	1,000
+Luxurious Signet	Ring	9	550,000	385	855
+Borealis	Ring	10	625,000	815	1,815
+Northwind Gem	Ring	10	650,000	835	1,850
+Blizzard Ring	Ring	10	690,000	855	1,905
+Bunbun Band	Ring	10	695,000	860	1,910
+Rubicon Prison	Ring	11	1,400,000	1,045	2,320
+Memento	Amulet	1	550	20	40
+Jade Pendant	Amulet	2	1,050	25	55
+Iron Bond	Amulet	3	2,450	40	85
+Mundra's Amulet	Amulet	3	5,300	55	125
+Sun Pendant	Amulet	4	5,950	60	130
+Eclipse Amulet	Amulet	4	8,600	70	155
+Medal of Honor	Amulet	4	9,000	70	160
+Noble Chain	Amulet	5	10,000	75	165
+Lucky Medallion	Amulet	5	19,000	100	225
+Luxurious Charm	Amulet	5	50,000	120	270
+Holy Symbol	Amulet	6	29,500	125	280
+Convenient Pendant	Amulet	6	40,500	125	325
+Titanium Torc	Amulet	7	78,500	200	445
+Magical Timepiece	Amulet	7	115,000	240	535
+Magatama Necklace	Amulet	8	200,000	315	700
+Dragonsoul Pendant	Amulet	8	245,000	345	770
+Archivist Glasses	Amulet	8	260,000	360	795
+Stygian Phylactery	Amulet	9	305,000	385	860
+Ursa Totem	Amulet	9	415,000	450	995
+Alimyriad	Amulet	10	610,000	810	1,795
+Freyja's Talisman	Amulet	10	630,000	820	1,825
+VIP Talisman	Amulet	10	650,000	835	1,850
+Brísingamen	Amulet	11	1,550,000	1,095	2,435
+Monsoon Heart	Amulet	11	1,700,000	1,145	2,545
+Forlorn Acorn	Amulet	11	1,800,000	1,175	2,615
+Chipped Runestone	Runestone	4	4,400	50	110
+Flawed Runestone	Runestone	7	57,500	175	385
+Chiseled Runestone	Runestone	9	160,000	285	630
+Lesser Moonstone	Moonstone	4	6,700	60	135
+Superior Moonstone	Moonstone	7	52,000	165	365
+Greater Moonstone	Moonstone	10	170,000	435	970
+Ember Element	Enchantment	4	8,150	70	150
+Flame Element	Enchantment	7	105,000	230	515
+Blaze Element	Enchantment	9	350,000	410	915
+Bubble Element	Enchantment	4	7,400	65	145
+Tide Element	Enchantment	7	100,000	225	500
+Flood Element	Enchantment	9	350,000	410	915
+Breeze Element	Enchantment	4	8,550	70	155
+Gale Element	Enchantment	7	99,500	225	500
+Tempest Element	Enchantment	9	350,000	410	915
+Nature Element	Enchantment	4	9,800	75	165
+Wild Element	Enchantment	7	96,500	225	495
+Primal Element	Enchantment	9	350,000	410	915
+Light Element	Enchantment	4	9,600	75	165
+Holy Element	Enchantment	7	96,500	225	495
+Sacred Element	Enchantment	9	350,000	410	915
+Corrupted Element	Enchantment	4	10,500	75	170
+Unholy Element	Enchantment	7	105,000	230	515
+Nightmare Element	Enchantment	9	350,000	410	915
+Wolf Spirit	Enchantment	4	9,200	70	160
+Ram Spirit	Enchantment	4	9,400	70	160
+Eagle Spirit	Enchantment	4	9,750	75	165
+Ox Spirit	Enchantment	4	10,000	75	165
+Viper Spirit	Enchantment	4	11,000	80	175
+Cat Spirit	Enchantment	4	12,000	80	180
+Rhino Spirit	Enchantment	7	110,000	235	525
+Owl Spirit	Enchantment	7	110,000	235	525
+Armadillo Spirit	Enchantment	7	115,000	240	535
+Horse Spirit	Enchantment	7	125,000	250	560
+Hippo Spirit	Enchantment	7	130,000	255	570
+Lizard Spirit	Enchantment	7	130,000	255	570
+Shark Spirit	Enchantment	9	350,000	410	915
+Bear Spirit	Enchantment	9	350,000	410	915
+Dinosaur Spirit	Enchantment	9	350,000	410	915
+Lion Spirit	Enchantment	9	350,000	410	915
+Mammoth Spirit	Enchantment	9	350,000	410	915
+Walrus Spirit	Enchantment	9	350,000	410	915
+</script>
+</body>
+</html>
