@@ -163,6 +163,5 @@ const TestScript = async () => {
 	config.FontSize = 14;
 	await db3.setObject(config);
 }
-
 document.addEventListener("DOMContentLoaded", TestScript);
 */
