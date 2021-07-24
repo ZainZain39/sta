@@ -433,7 +433,7 @@ const showModeE = filter => {
 }
 const getTypeInfo = Type => {
 	const {LocalType} = mapType.get(Type);
-	const {CostDown, TypeValueUp, AllValueUp} = mapCheckType.get(Type);
+	const {CostDown, TypeValueUp, AllValueUp} = mapCheckType.get(Type) ?? {CostDown: false, TypeValueUp: false, AllValueUp: false};
 	return {LocalType, CostDown, TypeValueUp, AllValueUp};
 }
 const showModeF = async filter => {
