@@ -18,6 +18,7 @@
 <!--
 			<label><input type="radio" class="changeMode showList" name="Mode" value="F"><span class="tglbutton">データチェック</span></label>
 -->
+			<label><input type="radio" class="changeMode showList" name="Mode" value="Z"><span class="tglbutton">このツールについて</span></label>
 		</div>
 		<div class="toggle-button">
 			<label><input type="radio" class="showList" name="Container" value="Type" checked><span class="tglbutton">タイプ別表示</span></label>
@@ -25,55 +26,55 @@
 		</div>
 	</div>
 	<div class="flexwrap gap5">
-		<div class="toggle-button mt10 HideE">
+		<div class="toggle-button mt10">
 			<label><input type="radio" class="showList" name="Rack" value="" checked><img src="./image/All.png" width="40" height="40"></label>
 		</div>
-		<div class="toggle-button mt10 HideE">
+		<div class="toggle-button mt10">
 			<label description="剣・斧・メイス・槍・ステッキ">
 				<input type="radio" class="showList" name="Rack" value="RackA">
 				<img src="./image/RackA.png" width="40" height="40">
 			</label>
 		</div>
-		<div class="toggle-button mt10 HideE">
+		<div class="toggle-button mt10">
 			<label description="短刀・弓・杖・銃・クロスボウ・盾">
 				<input type="radio" class="showList" name="Rack" value="RackB">
 				<img src="./image/RackB.png" width="40" height="40">
 			</label>
 		</div>
-		<div class="toggle-button mt10 HideE">
+		<div class="toggle-button mt10">
 			<label description="ヘルメット・ローグの帽子・魔術師の帽子">
 				<input type="radio" class="showList" name="Rack" value="RackCH">
 				<img src="./image/RackC.png" width="40" height="40">
 				<img src="./image/RackCH.png" width="40" height="40">
 				</label>
 		</div>
-		<div class="toggle-button mt10 HideE">
+		<div class="toggle-button mt10">
 			<label description="ヘビーアーマー・ライトアーマー・衣服">
 				<input type="radio" class="showList" name="Rack" value="RackCA">
 				<img src="./image/RackC.png" width="40" height="40">
 				<img src="./image/RackCA.png" width="40" height="40">
 				</label>
 		</div>
-		<div class="toggle-button mt10 HideE">
+		<div class="toggle-button mt10">
 			<label description="ヘルメット・ローグの帽子・魔術師の帽子">
 				<input type="radio" class="showList" name="Rack" value="RackCO">
 				<img src="./image/RackC.png" width="40" height="40">
 				<img src="./image/RackCO.png" width="40" height="40">
 			</label>
 		</div>
-		<div class="toggle-button mt10 HideE">
+		<div class="toggle-button mt10">
 			<label description="ガントレット・ブレイザー・フットウェア（重）・フットウェア（軽）">
 				<input type="radio" class="showList" name="Rack" value="RackD">
 				<img src="./image/RackD.png" width="40" height="40">
 			</label>
 		</div>
-		<div class="toggle-button mt10 HideA HideB HideC HideD HideE">
+		<div class="toggle-button mt10 HideA HideB HideC HideD HideE HideZ">
 			<label description="ルーンストーン・ムーンストーン">
 				<input type="radio" class="showList" name="Rack" value="RackE">
 				<img src="./image/Stone.png" width="40" height="40">
 			</label>
 		</div>
-		<div class="toggle-button mt10 HideA HideB HideC HideE">
+		<div class="toggle-button mt10 HideA HideB HideC">
 			<label description="エレメント・精霊">
 				<input type="radio" class="showList" name="Rack" value="RackF">
 				<img src="./image/Enchantment.png" width="40" height="40">
@@ -81,7 +82,7 @@
 		</div>
 	</div>
 	<div class="flexwrap gap10">
-		<div class="toggle-button mt10 HideE">
+		<div class="toggle-button mt10">
 			<label><input type="radio" class="showList" name="groupTier" value="all" checked><span class="tglbutton">＊</span></label>
 			<label><input type="checkbox" class="showList" name="Tier" value="1"><span class="tglbutton">１</span></label>
 			<label><input type="checkbox" class="showList" name="Tier" value="2"><span class="tglbutton">２</span></label>
@@ -95,7 +96,7 @@
 			<label><input type="checkbox" class="showList" name="Tier" value="10"><span class="tglbutton">10</span></label>
 			<label><input type="checkbox" class="showList" name="Tier" value="11"><span class="tglbutton">11</span></label>
 		</div>
-		<div class="toggle-button mt10 HideA HideD HideE">
+		<div class="toggle-button mt10 HideA HideD HideE HideZ">
 			<label><input type="radio" class="showList" name="Rarity" value="0" checked><span class="tglbutton q0">普通</span></label>
 			<label><input type="radio" class="showList" name="Rarity" value="1"><span class="tglbutton q1">上級</span></label>
 			<label><input type="radio" class="showList" name="Rarity" value="2"><span class="tglbutton q2">上質</span></label>
@@ -104,7 +105,7 @@
 		</div>
 	</div>
 	<div class="flexwrap gap10">
-		<div class="flexwrap gap5 HideD HideE">
+		<div class="flexwrap gap5 HideD HideE HideZ">
 			<label description="あなたのお店の最大エネルギーを入力してください">
 				<input type="text" id="$MaxEnergy" class="showList mt10" data-para="MaxEnergy" size="5">
 			</label>
@@ -123,8 +124,8 @@
 		</div>
 	</div>
 	<div class="flexwrap gap10">
-		<div class="flexwrap gap5 HideA HideB HideD HideE">
-			<select id="$ElementValue"class="mt10">
+		<div class="flexwrap gap5 HideA HideB HideD HideE HideZ">
+			<select id="$ElementValue" class="showList mt10">
 				<option value="0">未選択</option>
 				<option value="350000">9.ティア９のエレメント</option>
 				<option value="105000">7.火のエレメント(火)</option>
@@ -140,7 +141,7 @@
 				<option value="9600">4.光のエレメント(光)</option>
 				<option value="10500">4.汚染のエレメント(闇)</option>
 			</select>
-			<select id="$SpiritValue"class="mt10">
+			<select id="$SpiritValue" class="showList mt10">
 				<option value="0">未選択</option>
 				<option value="350000">9.ティア９の精霊</option>
 				<option value="110000">7.サイの精霊</option>
@@ -159,7 +160,7 @@
 		</div>
 	</div>
 	<div class="flexwrap gap10">
-		<div class="toggle-button mt10 HideA HideB HideC HideE HideX">
+		<div class="toggle-button mt10 HideA HideB HideC HideE HideX HideZ">
 			<label><input type="radio" class="showList" name="Donated" value="all" checked><span class="tglbutton">すべて表示</span></label>
 			<label><input type="radio" class="showList" name="Donated" value="0"><span class="tglbutton q0">普通&#010;未寄付表示</span></label>
 			<label><input type="radio" class="showList" name="Donated" value="1"><span class="tglbutton q1">上級&#010;未寄付表示</span></label>
@@ -189,45 +190,68 @@
 <main>
 
 	<div id="$List" class="flexwrap"></div>
-	<div class="information mt5 HideB HideC HideD HideE HideF">
-		NPC販売のエネルギー換算率を判定しお得な販売方法を指示します<br>
-		　－：通常販売推奨　半：割引販売推奨　倍：追加料金販売推奨　王：王様販売推奨<br>
-		　※赤字表示は未寄付アイテム、最大エネルギーが追加販売エネルギーに足りていないものは"－"表記となります<br>
+	<div class="information mt5 HideA HideB HideC HideD HideE HideF">
+		はじめに<br>
+		このツールはショップタイタンでアイテム販売を行う際のあれこれを補助する目的で作成しました<br>
+		「このティア10の上級って半額売り？倍額売り？」「このアイテム融合予定だったかな？コレクション確認しなきゃ」といった悩みを解決します<br>
 		<br>
-		マーク部分をクリックすると"注"表記となります<br>
-		マーケットでジェム売りしたいものや融合予定で集めているものに設定してください<br>
-		もう一度クリックすると解除されます<br>
+		なお個人利用のため作ったものを気まぐれでアップしているだけなので勝手に拡散するのはおやめください<br>
+		諸事情により急遽公開を中止する可能性があることもご了承ください<br>
+		このツールの結果に従った結果、損失が出たとしても責任はとりません<br>
+		鵜呑みにせず自分でも計算してみてくださいね（そしてバグがあれば教えてください）<br>
+	</div>
+	<div class="information mt5 HideA HideB HideC HideD HideE HideF">
+		販売補助について<br>
+		NPC販売の割引販売・追加料金販売のエネルギー換算率を判定しお得な販売方法を表示します<br>
+		凡例）‐：通常販売推奨　半：割引販売推奨　倍：追加料金販売推奨　王：王様献上品<br>
+		※赤字表示は未寄付アイテムです　品質が上のものが赤字の場合は融合すべきか検討してください<br>
+		※最大エネルギーが追加販売に必要なエネルギーに足りていないものは"‐"表記となります<br>
+		※マーク部分をクリックすると"？"表記となります<br>
+		　マーケット売りしたほうが得になりそうなものにチェックしてください<br>
+		　もう一度クリックすると解除されます<br>
+	</div>
+	<div class="information mt5 HideA HideB HideC HideD HideE HideF">
+		仕入補助について<br>
+		マーケットでアイテムを仕入れる際に損をしない仕入れ値を計算して表示します<br>
+		わざわざ仕入れたものは追加料金販売をすると思いますのでエネルギー換算率の低いものは表示対象外です<br>
+		追加料金販売金額から追加販売に必要なコストを引いているのでこれ以下で仕入れれば損はしないはず<br>
+	</div>
+	<div class="information mt5 HideA HideB HideC HideD HideE HideF">
+		付与補助について<br>
+		アイテムにエンチャントした際の価格変化を表示します<br>
+		黒字はエンチャント後の金額がエンチャント価格と同じもの、赤字はそれより増額、赤字はそれより減額です<br>
+		グレイ表記は倍売りできない、または換算率の悪いものです<br>
 		<br>
-		エンチャントによる価格変化対応を検討中…<br>
+		取り急ぎ実装しましたのでバグなどありましたら報告してください<br>
 	</div>
-	<div class="information mt5 HideA HideC HideD HideE HideF">
-		マーケットでアイテムを仕入れる際の損をしない仕入れ値を計算します（仕入れは自己責任でお願いします）<br>
-		仕入れたものは追加料金販売する想定ですのでエネルギー換算率の低いものは表示対象外です<br>
-		<br>
-		「こんな仕入れの考え方もあるよ」ってアイディアあれば教えてください<br>
-		「ティア９仕入れてエンチャントして売るよ」ってどういう計算するのが正解ですかねぇ<br>
-	</div>
-	<div class="information mt5 HideA HideB HideD HideE HideF">
-		ショップタイタンは独自の金額丸め処理があるので付与するアイテムを選ばないと損するかも<br>
-		その補助となる機能にしたいけれどまだ検討中<br>
-	</div>
-	<div class="information mt5 HideA HideB HideC HideE HideF">
+	<div class="information mt5 HideA HideB HideC HideD HideE HideF">
+		開発進捗・寄付管理について<br>
 		各アイテムの開発進捗と寄付状況を管理します<br>
-		チェックをつけると販売補助や仕入補助の計算がそれを考慮した値となります<br>
-		<br>
-		未寄付のアイテムが販売補助で赤文字表示になるのがお気に入り<br>
+		チェックを付けると販売補助や仕入補助の計算値がそれを考慮したものとなります<br>
+		お気に入りは未寄付品は販売補助で赤字表示されるところ<br>
 	</div>
-	<div class="information mt5 HideA HideB HideC HideD HideF">
+	<div class="information mt5 HideA HideB HideC HideD HideE HideF">
+		進化進捗管理について<br>
 		進化の軌跡を管理します<br>
-		販売補助や仕入補助のの計算がそれを考慮した値となります<br>
-		<br>
-		種類ごとの価格アップ対応、実はやってません<br>
-		そこまで進化を貯めた種類がないので検証できないんです、すみません<br>
-		全価格１％アップみたいに単純に販売価格に倍率含めて計算すればいいのかな？<br>
-		タイタン２つ、種類別価格アップ１つなら追加料金販売時に販売価格×2.07？<br>
+		チェックを付けると販売補助や仕入補助の計算値がそれを考慮したものとなります<br>
+		と言いたいところですけど実は種類ごとの価格アップ対応できてません<br>
+		そこまで進化を進めた種類がないので検証できないんです<br>
+		タイタンの全価格１％アップと同じように単純に販売価格に倍率含めて計算すればいいのかな？<br>
+		タイタン２つ、種類別価格アップ１つなら追加料金販売金額は販売金額×(2＋0.02＋0.05）?<br>
 	</div>
-	<div class="information mt5 HideA HideB HideC HideD HideE">
-		モードF用
+	<div class="information mt5 HideA HideB HideC HideD HideE HideF">
+		今後の構想について<br>
+		・最優先で付与補助機能の実装<br>
+		・販売補助にエンチャントしたときの価格変化対応機能<br>
+		・"？"表記を別表で一覧表示して、マーケット売りの"マ"、ジェム売りの"Ｇ"などに表記を切り替える機能<br>
+		・仕入補助に別の仕入ロジックへの表示切替機能（アイディア求む）<br>
+		　単純に追加料金販売金額への表示切替機能もあったほうが良い？<br>
+		・起動時に表示がガツンと切り替わるところや初回表示の重さをなんとかしたいところ<br>
+	</div>
+	<div class="information mt5 HideA HideB HideC HideD HideE HideF">
+		更新履歴<br>
+		2021/07/24 こっそり公開開始<br>
+		2021/07/25 説明ページを新設、付与補助機能の実装、細かい修正をいくつか<br>
 	</div>
 
 	<template id="$ModeA_group">
@@ -272,9 +296,7 @@
 		<template id="$ModeC_data">
 			<div class="flexwrap title data plr">
 				<span></span>
-				<label class="plr" title="追加料金エネルギー -10%"><input type="checkbox"></input></label>
-				<label class="plr" title="追加料金 +5%"><input type="checkbox"></input></label>
-				<label class="plr" title="全追加料金 +1%"><input type="checkbox"></input></label>
+				<span></span>
 			</div>
 		</template>
 
