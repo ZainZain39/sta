@@ -1,0 +1,2049 @@
+@item.js
+
+@togglebutton.js
+class ToggleButton extends HTMLElement {
+	constructor() {
+		super();
+		this.root = this.attachShadow({mode: "open"});
+		this.setObserver();
+	}
+	setObserver() {
+		this.observer = new MutationObserver(mutations => {
+			this.observer.disconnect();
+			this.render();
+		});
+		this.observer.observe(this, {
+			childList: true
+		});
+	}
+	render() {
+		this.type = this.getAttribute("type") ?? "select";
+		this.target = [];
+		this.reset = null;
+		this.resetTarget = [];
+
+		const fragment = new DocumentFragment();
+
+		const style = document.createElement("style");
+		fragment.appendChild(style);
+		style.innerHTML = css_togglebutton;
+
+		const name = this.getAttribute("id");
+		const format = this.getAttribute("format") ?? "button";
+
+		const container = document.createElement("div");
+		fragment.appendChild(container);
+		container.setAttribute("class", format);
+
+		[...this.children].forEach(child => {
+			const reset = child.nodeName.includes("RESET-");
+			const type = child.nodeName.includes("CHECK-") ? "checkbox" : "radio";
+			const css = child.getAttribute("class");
+			const title = child.getAttribute("title");
+			const value = child.getAttribute("value");
+			const checked = child.hasAttribute("checked");
+			const content = child.innerHTML;
+
+			const label = document.createElement("label");
+			container.appendChild(label);
+			const input = document.createElement("input");
+			label.appendChild(input);
+			const span = document.createElement("span");
+			label.appendChild(span);
+			if(css) span.setAttribute("class", css);
+
+			input.setAttribute("type", type);
+			input.setAttribute("name", name);
+			if(value) input.setAttribute("value", value);
+			input.checked = checked;
+			if(title) span.setAttribute("title", title);
+			span.innerHTML = content;
+
+			if(reset) {
+				this.reset = input;
+			} else {
+				this.target.push(input);
+				if(type === "checkbox") this.resetTarget.push(input);
+			}
+		});
+
+		if(this.reset) {
+			this.resetTarget.forEach(e => e.addEventListener("change", () => this.reset.checked = this.resetTarget.filter(target => target.checked).length ? false : true));
+			this.reset.addEventListener("change", () => {
+				this.resetTarget.forEach(target => target.checked = false);
+				this.myEvent();
+			});
+		}
+		this.target.forEach(e => e.addEventListener("change", this.myEvent));
+
+		this.root.appendChild(fragment);
+		this.setObserver();
+	}
+	myEvent() {
+		const event = new CustomEvent("changed", {
+			bubbles: true,
+			composed: true,
+		});
+		this.dispatchEvent(event);
+	}
+	get value() {
+		if(this.classList.contains("reject")) return this.target.flatMap(e => e.value.split(","));
+		if(this.reset?.checked) return this.target.flatMap(e => e.value.split(","));
+		return this.target.filter(e => this.type === "select" ? e.checked : !e.checked).flatMap(e => e.value.split(","));
+	}
+}
+const css_togglebutton = `
+input {
+	display: none;
+}
+img {
+	height: 30px;
+	width: 30px;
+	float:left;
+	vertical-align: top;
+	pointer-events: none;
+}
+
+.button {
+	display: inline-flex;
+	flex-wrap: wrap;
+	border-radius: 5px;
+	overflow: hidden;
+	gap: 1.5px;
+	background: #000;
+}
+.button label {
+	display: flex;
+	flex-grow: 1;
+	cursor: pointer;
+}
+.button span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	width: 100%;
+	padding: 5px 10px;
+	opacity: .7;
+	background: #1f783f;
+	color: #fff;
+	text-shadow: 0px 0px 5px #000;
+}
+.button span:hover {
+	opacity: .9;
+	color: #ff0;
+}
+.button :checked + span {
+	opacity: 1;
+}
+.button .quality0 {
+	background: #b2b2b2;
+}
+.button .quality1 {
+	background: #60ff9c;
+}
+.button .quality2 {
+	background: #5df8ff;
+}
+.button .quality3 {
+	background: #d342ff;
+}
+.button .quality4 {
+	background: #ffe250;
+}
+.button .gray {
+	background: #ccc;
+}
+.button .red {
+	background: #f00;
+}
+.button .green {
+	background: #0f0;
+}
+.button .blue {
+	background: #00f;
+}
+
+.icon {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 5px;
+}
+.icon label {
+	display: flex;
+	cursor: pointer;
+}
+.icon span {
+	border: 3px solid #ccc;
+	border-radius: 10px;
+	overflow: hidden;
+}
+.icon :checked + span {
+	border: 3px solid #ff0;
+}
+`;
+customElements.define("toggle-button", ToggleButton);
+
+@grouplist.js
+class GroupList extends HTMLElement {
+	static get observedAttributes() { return ["format", "group", "list"]; }
+
+	constructor() {
+		super();
+		this.root = this.attachShadow({mode: "open"});
+	}
+	attributeChangedCallback(name, oldValue, newValue) {
+//		if(oldValue === newValue) return;
+		if(name === "group") this.group = newValue;
+		if(name === "format") this.format = newValue;
+		this.render();
+	}
+	render() {
+		this.root.innerHTML = "";
+
+		const list = this.getAttribute("list");
+		if(!list) {
+			this.classList.add("reject");
+			return;
+		}
+
+		const fragment = new DocumentFragment();
+
+		const style = document.createElement("style");
+		style.innerHTML = css_grouplist;
+		fragment.appendChild(style);
+
+		const div = document.createElement("div");
+		fragment.appendChild(div);
+		div.classList.add("container");
+
+		div.appendChild(this.createHeader());
+		list.split(",").forEach(v => {
+			div.appendChild(this.createItem(v));
+		});
+		this.root.appendChild(fragment);
+
+		this.root.querySelectorAll(".changeCheckItem").forEach(e => {
+			e.addEventListener("change", changeCheckItem)
+		});
+
+		this.root.querySelectorAll(".changeCheckType").forEach(e => {
+			e.addEventListener("change", changeCheckType)
+		});
+
+		this.root.querySelectorAll(".clickRate").forEach(e => {
+			e.addEventListener("click", changeRate);
+		});
+
+		const item_count = this.root.querySelectorAll(".item").length;
+		this.classList.toggle("reject", item_count == 0);
+	}
+	createHeader() {
+		const LcalGroup = myApp.LocalStringMap.get(this.group) ?? this.group;
+		const html = {
+			formatStatus: `
+				<div class="header">
+					<span>${LcalGroup}</span>
+				</div>
+				<div class="title">
+					<span class="htier"></span>
+					<span class="hname">アイテム名</span>
+					<span class="hstatus">ATK</span>
+					<span class="hstatus">DEF</span>
+					<span class="hstatus">HP</span>
+					<span class="hstatus">EVA</span>
+					<span class="hstatus">CRIT</span>
+				</div>
+			`,
+			formatSell: `
+				<div class="header">
+					<span>${LcalGroup}</span>
+				</div>
+				<div class="title">
+					<span class="htier"></span>
+					<span class="hname">アイテム名</span>
+					<span class="hvalue">価格</span>
+					<span class="henergy">割引エネ</span>
+					<span class="hcost">コスト</span>
+					<span class="hvalue">追加販売価格</span>
+					<span class="henergy">追加販売エネ</span>
+					<span class="hcost">還元率</span>
+					<span class="hsell">推奨販売方法</span>
+				</div>
+			`,
+			formatMarket: `
+				<div class="header">
+					<span>${LcalGroup}</span>
+				</div>
+				<div class="title">
+					<span class="htier"></span>
+					<span class="hname">アイテム名</span>
+					<span class="hvalue">追加販売価格</span>
+					<span class="hvalue">追加販売コスト</span>
+					<span class="hvalue">推奨仕入価格</span>
+				</div>
+			`,
+			formatEnchantment: `
+				<div class="header">
+					<span>${LcalGroup}</span>
+				</div>
+				<div class="title">
+					<span class="htier"></span>
+					<span class="hname">アイテム名</span>
+					<span class="hvalue">エンチャント前</span>
+					<span class="hvalue">増加額</span>
+					<span class="hvalue">エンチャント後</span>
+					<span class="hvalue">追加販売価格</span>
+					<span class="hcost">還元率</span>
+				</div>
+			`,
+			formatCheckItem: `
+				<div class="header">
+					<span>${LcalGroup}</span>
+				</div>
+				<div class="title">
+					<span class="htier"></span>
+					<span class="hname">アイテム名</span>
+					<span class="hcheck">価格UP</span>
+				</div>
+			`,
+			formatCheckType: `
+				<div class="header">
+					<span>${LcalGroup}</span>
+				</div>
+				<div class="title">
+					<span class="hname">アイテム名</span>
+					<span class="hcheck2">追加料金<br>エネルギー -10%</span>
+					<span class="hcheck2">タイプ別<br>追加料金 +5%</span>
+					<span class="hcheck2">全アイテム<br>追加料金 +1%</span>
+				</div>
+			`,
+			formatDefault: `
+				<div class="header">
+					<span>${this.group}</span>
+				</div>
+			`,
+		}
+		const tmplate = document.createElement("template");
+		tmplate.innerHTML = html[this.format in html ? this.format : "formatDefault"];
+		return tmplate.content;
+	}
+	createItem(key) {
+		const func = {
+			formatSell: this.createItem_formatSell,
+			formatMarket: this.createItem_formatMarket,
+			formatEnchantment: this.createItem_formatEnchantment,
+			formatStatus: this.createItem_formatStatus,
+			formatCheckItem: this.createItem_formatCheckItem,
+			formatCheckType: this.createItem_formatCheckType,
+			formatXXX: this.createItem_formatXXX,
+		}
+		if(this.format in func) {
+			return func[this.format](key);
+		} else {
+			return func["formatXXX"](key);
+		}
+	}
+	createItem_formatStatus(key) {
+		const item = myApp.ItemMap.get(key);
+		const tmplate = document.createElement("template");
+		const status = selectStatus.value[0];
+		if(status != "on" && !(status in item)) return tmplate.content;
+		const qarity = switchQuality.value[0];
+		tmplate.innerHTML = tagLocalNumber`
+			<div class="item" title="${item.LocalName}">
+				<span class="tier">${item.Tier}</span>
+				<span class="name">${item.LocalName}</span>
+				<span class="status">${item.getATK[qarity]}</span>
+				<span class="status">${item.getDEF[qarity]}</span>
+				<span class="status">${item.getHP[qarity]}</span>
+				<span class="status">${item.getEVA}</span>
+				<span class="status">${item.getCRIT}</span>
+			</div>
+		`;
+		return tmplate.content;
+	}
+	createItem_formatSell(key) {
+		const sMaxEnergy = $MaxEnergy.value;
+		const sDiscountThreshold = $DiscountThreshold.value;
+		const sSurchargeThreshold = $SurchargeThreshold.value;
+		const [MaxEnergy, DiscountThreshold, SurchargeThreshold] = String2Number(sMaxEnergy, sDiscountThreshold, sSurchargeThreshold);
+		const qarity = switchQuality.value[0];
+
+		const item = myApp.ItemMap.get(key);
+		const sell = ["－", "－", "－", "－", "－"];
+		const DiscountCost = [];
+		const SurchargeValue = [];
+		const SurchargeCost = [];
+		sell.forEach((_,i) => {
+			DiscountCost[i] = Math.floor(item.RoundNowValue[i] / 2 / item.DiscountEnergy);
+			SurchargeValue[i] = Math.floor((item.RoundNowValue[i] * (200 + myApp.AllValueUp + (item.CheckType.TypeValueUp ? 5 : 0)) / 100));
+			SurchargeCost[i] = Math.floor((SurchargeValue[i] - item.RoundNowValue[i]) / item.NowSurchargeEnergy);
+
+			if(DiscountCost[i] <= DiscountThreshold) sell[i] = "半";
+			if(SurchargeCost[i] >= SurchargeThreshold && item.NowSurchargeEnergy <= MaxEnergy) sell[i] = "倍";
+		});
+		const cssValue = item.CheckItem.ValueUp ? "value valueup" : "value";
+		const cssCost = item.CheckType.CostDown ? "energy costdown" : "energy";
+
+		const tmplate = document.createElement("template");
+		tmplate.innerHTML = tagLocalNumber`
+			<div class="item" title="${item.LocalName}">
+				<span class="tier">${item.Tier}</span>
+				<span class="name">${item.LocalName}</span>
+				<span class="${cssValue}">${item.RoundNowValue[qarity]}</span>
+				<span class="energy">${item.DiscountEnergy}</span>
+				<span class="cost">${DiscountCost[qarity]}</span>
+				<span class="value">${SurchargeValue[qarity]}</span>
+				<span class="${cssCost}">${item.NowSurchargeEnergy}</span>
+				<span class="cost">${SurchargeCost[qarity]}</span>
+				<span class="sell quality0">${sell[0]}</span>
+				<span class="sell quality1">${sell[1]}</span>
+				<span class="sell quality2">${sell[2]}</span>
+				<span class="sell quality3">${sell[3]}</span>
+				<span class="sell quality4">${sell[4]}</span>
+			</div>
+		`;
+		return tmplate.content;
+	}
+	createItem_formatMarket(key) {
+		const sMaxEnergy = $MaxEnergy.value;
+		const sDiscountThreshold = $DiscountThreshold.value;
+		const sSurchargeThreshold = $SurchargeThreshold.value;
+		const [MaxEnergy, DiscountThreshold, SurchargeThreshold] = String2Number(sMaxEnergy, sDiscountThreshold, sSurchargeThreshold);
+		const qarity = switchQuality.value[0];
+
+		const item = myApp.ItemMap.get(key);
+		const DiscountCost = Math.floor(item.RoundNowValue[qarity] / 2 / item.DiscountEnergy);
+		const SurchargeValue = Math.floor((item.RoundNowValue[qarity] * (200 + myApp.AllValueUp + (item.CheckType.TypeValueUp ? 5 : 0)) / 100));
+		const SurchargeCost = Math.floor((SurchargeValue - item.RoundNowValue[qarity]) / item.NowSurchargeEnergy);
+		const Cost = item.NowSurchargeEnergy * sDiscountThreshold;
+		const BuyValue = SurchargeValue - Cost;
+
+		const tmplate = document.createElement("template");
+		if(!(SurchargeCost >= SurchargeThreshold && item.NowSurchargeEnergy <= MaxEnergy)) return tmplate.content;
+		tmplate.innerHTML = tagLocalNumber`
+			<div class="item clickRate" title="${item.LocalName}" data-value="${BuyValue}">
+				<span class="tier">${item.Tier}</span>
+				<span class="name">${item.LocalName}</span>
+				<span class="value">${SurchargeValue}</span>
+				<span class="value">${Cost}</span>
+				<span class="value">${BuyValue}</span>
+			</div>
+		`;
+		return tmplate.content;
+	}
+	createItem_formatEnchantment(key) {
+		const sMaxEnergy = $MaxEnergy.value;
+		const sSurchargeThreshold = $SurchargeThreshold.value;
+		const sElementValue = $ElementValue.value;
+		const sSpiritValue = $SpiritValue.value;
+		const [MaxEnergy, SurchargeThreshold, ElementValue, SpiritValue] = String2Number(sMaxEnergy, sSurchargeThreshold, sElementValue, sSpiritValue);
+		const qarity = switchQuality.value[0];
+
+		const item = myApp.ItemMap.get(key);
+		const tmplate = document.createElement("template");
+		if(ElementValue != 0 && item.EnchantedE) return tmplate.content;
+		if(SpiritValue != 0 && item.EnchantedS) return tmplate.content;
+		if(item.NowSurchargeEnergy > MaxEnergy) return tmplate.content;
+
+		const RoundNowValue = RoundValue(item.NowValue[0] * ValueWeight[qarity] / 100);
+		const RoundEnchantValue = RoundValue((item.NowValue[0] + Math.min(item.NowValue[0], ElementValue) + Math.min(item.NowValue[0], SpiritValue)) * ValueWeight[qarity] / 100);
+		const DiffValue = RoundEnchantValue - RoundNowValue;
+		const SurchargeValue = Math.floor((RoundEnchantValue * (200 + myApp.AllValueUp + (item.CheckType.TypeValueUp ? 5 : 0)) / 100));
+		const SurchargeCost = Math.floor((SurchargeValue- RoundNowValue) / item.NowSurchargeEnergy);
+		if(SurchargeCost < SurchargeThreshold) return tmplate.content;
+		tmplate.innerHTML = tagLocalNumber`
+			<div class="item" title="${item.LocalName}">
+				<span class="tier">${item.Tier}</span>
+				<span class="name">${item.LocalName}</span>
+				<span class="value">${RoundNowValue}</span>
+				<span class="value">${DiffValue}</span>
+				<span class="value">${RoundEnchantValue}</span>
+				<span class="value">${SurchargeValue}</span>
+				<span class="cost">${SurchargeCost}</span>
+			</div>
+		`;
+		return tmplate.content;
+	}
+	createItem_formatCheckItem(key) {
+		const item = myApp.ItemMap.get(key);
+
+		const checked_valueup = item.CheckItem.ValueUp ? " checked" : "";
+
+		const tmplate = document.createElement("template");
+		tmplate.innerHTML = tagLocalNumber`
+			<div class="item" title="${item.LocalName}">
+				<span class="tier">${item.Tier}</span>
+				<span class="name">${item.LocalName}</span>
+				<label class="check"><input type="checkbox" class="changeCheckItem" data--name="${item.Name}" data-key="ValueUp"${checked_valueup}></label>
+			</div>
+		`;
+		return tmplate.content;
+	}
+	createItem_formatCheckType(key) {
+		let {
+			Type = key, CostDown = false, TypeValueUp = false, AllValueUp = false,
+		} = myApp.CheckTypeDbMap.get(key) ?? {};
+		const LocalType = myApp.LocalStringMap.get(Type) ?? Type;
+		const checked_costdown = CostDown ? " checked" : "";
+		const checked_typevalueup = TypeValueUp ? " checked" : "";
+		const checked_allvalueup = AllValueUp ? " checked" : "";
+
+		const tmplate = document.createElement("template");
+		tmplate.innerHTML = tagLocalNumber`
+			<div class="item" title="${LocalType}">
+				<span class="type" title="${LocalType}">${LocalType}</span>
+				<label class="check2"><input type="checkbox" class="changeCheckType" data--name="${Type}" data-key="CostDown"${checked_costdown}></label>
+				<label class="check2"><input type="checkbox" class="changeCheckType" data--name="${Type}" data-key="TypeValueUp"${checked_typevalueup}></label>
+				<label class="check2"><input type="checkbox" class="changeCheckType" data--name="${Type}" data-key="AllValueUp"${checked_allvalueup}></label>
+			</div>
+		`;
+		return tmplate.content;
+	}
+	createItem_formatXXX(key) {
+		const tmplate = document.createElement("template");
+		tmplate.innerHTML = `
+			<div class="item" title="${key}">
+				<span class="name">${key}</span>
+			</div>
+		`;
+		return tmplate.content;
+	}
+}
+const css_grouplist = `
+label {
+	cursor: pointer;
+}
+
+.container {
+	background: #fff;
+	color: #000;
+}
+.header {
+	display: flex;
+	gap: 5px;
+	border-bottom: 1px solid #000;
+	padding: 3px 5px;
+	font-weight: bold;
+	background: #ff9;
+}
+.title {
+	display: flex;
+	gap: 5px;
+	font-weight: bold;
+	padding: 3px 5px 0;
+}
+.item {
+	display: flex;
+	gap: 5px;
+	display: flex;
+	gap: 5px;
+	padding: 0 5px 0;
+}
+.item:nth-child(2n) {
+	background-color: #dfe;
+}
+.item:hover {
+	font-weight: bold;
+}
+
+.htier {
+	width: 25px;
+	border-bottom: 1px dashed #000;
+}
+.hname {
+	width: 120px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	border-bottom: 1px dashed #000;
+}
+.hstatus {
+	width: 40px;
+	border-bottom: 1px dashed #000;
+	text-align: center;
+}
+.hcheck {
+	width: 50px;
+	border-bottom: 1px dashed #000;
+	text-align: center;
+}
+.hcheck2 {
+	width: 100px;
+	border-bottom: 1px dashed #000;
+	text-align: center;
+}
+.hsell {
+	width: 120px;
+	border-bottom: 1px dashed #000;
+	text-align: center;
+}
+.hvalue {
+	width: 100px;
+	border-bottom: 1px dashed #000;
+	margin-left: 5px;
+	text-align: center;
+}
+.henergy {
+	width: 80px;
+	border-bottom: 1px dashed #000;
+	margin-left: 5px;
+	text-align: center;
+}
+.hcost {
+	width: 40px;
+	border-bottom: 1px dashed #000;
+	margin-left: 5px;
+	text-align: center;
+}
+
+.tier {
+	width: 25px;
+	text-align: right;
+}
+.tier::after {
+	content: ".";
+}
+.name {
+	width: 120px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.type {
+	width: 120px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.status {
+	width: 40px;
+	text-align: right;
+}
+.check {
+	width: 50px;
+	text-align: center;
+}
+.check2 {
+	width: 100px;
+	text-align: center;
+}
+.sell {
+	width: 20px;
+	text-align: center;
+}
+.value {
+	width: 100px;
+	text-align: right;
+	margin-left: 5px;
+}
+.energy {
+	width: 80px;
+	text-align: right;
+	margin-left: 5px;
+}
+.cost {
+	width: 40px;
+	text-align: right;
+	margin-left: 5px;
+}
+
+.valueup {
+	color: #00f;
+}
+.costdown {
+	color: #00f;
+}
+
+.quality0 {
+	background-color: #b2b2b2;
+}
+.quality1 {
+	background-color: #60ff9c;
+}
+.quality2 {
+	background-color: #5df8ff;
+}
+.quality3 {
+	background-color: #d342ff;
+}
+.quality4 {
+	background-color: #ffe250;
+}
+`;
+customElements.define("group-list", GroupList);
+
+@showfilter.js
+class ShowFilter extends HTMLDivElement {
+	static get observedAttributes() { return ["select"]; }
+
+	constructor() {
+		super();
+		this.root = this.attachShadow({mode: "open"});
+	}
+	attributeChangedCallback(name, oldValue, newValue) {
+		this.selected = newValue.replaceAll(" ", "-").split(",");
+		this.render();
+	}
+	setObserver() {
+		this.observer = new MutationObserver(mutations => {
+			this.observer.disconnect();
+			this.render();
+		});
+		this.observer.observe(this, {
+			childList: true
+		});
+	}
+	render() {
+		this.root.innerHTML = "";
+		const style = document.createElement("style");
+		style.textContent = css_ShowFilter;
+		this.root.appendChild(style);
+		for(const child of this.children) {
+			const div = document.createElement("div");
+			div.classList.add("item");
+			const selected = this.selected.some(v => child.classList.contains(v));
+			div.classList.toggle("selected", selected);
+			div.appendChild(child.cloneNode(true));
+			this.root.appendChild(div);
+		}
+		this.setObserver();
+	}
+}
+const css_ShowFilter = `
+:host {
+	display: flex;
+	gap: 1px;
+}
+span {
+	display: flex;
+	justify-content: center;
+	font-size: 1em;
+}
+img {
+	width: 100%;
+	float:left;
+	vertical-align: bottom;
+pointer-events: none;
+
+	filter: invert(80%) grayscale(100%);
+}
+
+.item {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	color: #000;
+	background: #ccc;
+	user-drag: none;
+	border-radius: 10px;
+	overflow: hidden;
+	box-sizing: border-box;
+	color: #666;
+	max-width: 30px;
+}
+
+.selected {
+	background: fuchsia;
+}
+
+.selected > span {
+	color: #fcc;
+}
+.selected > img {
+	filter: invert(0%) grayscale(0%) brightness(180%) saturate(200%);
+}
+
+`;
+customElements.define('show-filter', ShowFilter, { extends: "div" });
+
+@job.js
+Fighter
+Soldier,Mercenary
+	Sword,Mace,Dagger,@Spear
+	Heavy Armor
+	Gauntlets
+	Heavy Footwear
+	Potion
+	Shield
+	Earth
+Barbarian,Chieftain
+	Sword,Axe,Spear,Mace
+	Helmet
+	Gauntlets
+	Heavy Footwear
+	Potion
+	Herbal Medicine,@Shield
+	Fire
+Knight,Lord
+	Spear,Axe,@Sword,@Mace
+	Heavy Armor
+	Gauntlets
+	Helmet
+	Heavy Footwear
+	Shield
+	Light
+Ranger,Warden
+	Bow,Crossbow,Gun
+	Heavy Armor
+	Gauntlets
+	Helmet
+	Potion
+	Ring
+	Air
+Samurai,Daimyo
+	Sword,Bow,Spear
+	Heavy Armor
+	Gauntlets
+	Helmet
+	Heavy Footwear
+	Potion
+	Water
+Berserker,Jarl
+	Mace,Axe,Gun
+	Heavy Armor
+	Gauntlets,@Helmet
+	Heavy Footwear
+	Shield
+	Herbal Medicine,Potion
+	Fire
+
+Rogue
+Thief,Trickster
+	Dagger,Bow,Crossbow
+	Light Armor
+	Rogue Hat
+	Gloves,@Light Footwear
+	Amulet
+	Ring
+	Air
+Monk,Grandmaster
+	Clothes
+	Amulet
+	Amulet
+	Amulet
+	Ring
+	Ring
+	Water
+Musketeer,Conquistador
+	Crossbow,Sword,Gun
+	Light Armor
+	Gloves
+	Heavy Footwear,@Light Footwear
+	Potion
+	Amulet
+	Fire
+Wanderer,Pathfinder
+	Dagger,Axe,Gun
+	Light Armor
+	Rogue Hat
+	Light Footwear
+	Herbal Medicine
+	Amulet
+	Earth
+Ninja,Sensei
+	Dagger,Sword,Bow
+	Light Armor
+	Rogue Hat
+	Gloves
+	Light Footwear
+	Ring
+	Dark
+Dancer,Acrobat
+	Dagger,Bow,Crossbow,Wand
+	Light Armor
+	Rogue Hat
+	Gloves
+	Light Footwear
+	Ring,Amulet
+	Air
+
+Spellcaster
+Mage,Archmage
+	Staff,Crossbow,Wand
+	Clothes
+	Magician Hat
+	Light Footwear
+	Spell
+	Ring
+	Fire
+Cleric,Bishop
+	Mace,Spear,Wand
+	Clothes
+	Magician Hat
+	Light Footwear
+	Spell
+	Shield,@Ring
+	Light
+Druid,Arch Druid
+	Bow,Staff,Wand
+	Clothes
+	HerbalMedicine
+	Herbal Medicine
+	Amulet,Ring
+	Spell
+	Earth
+Sorcerer,Warlock
+	Staff,Dagger,Wand
+	Clothes
+	Gloves
+	Light Footwear
+	Spell
+	Spell
+	Dark
+Spellblade,Spellknight
+	Sword,Axe,Staff,Bow
+	Heavy Armor,Light Amor,Clothes
+	Magician Hat,Helmet,Gauntlets,Gloves
+	Heavy Footwear,Light Footwear
+	Amulet,Ring,Potion,Spell
+	Amulet,Ring,Herbal Medicine,Shield
+	Any
+Geomancer,Astramancer
+	Staff,Mace,Wand
+	Clothes
+	Magician Hat
+	Gloves
+	Spell
+	Herbal Medicine,Shield
+	Water
+
+{
+	Class: "Fighter",
+	Job: "Soldier",
+	PromotionJob: "Mercenary",
+	Slot1: ["Sword","Mace","Dagger"],
+	Slot2: ["Heavy Armor"],
+	Slot3: ["Gauntlets"],
+	Slot4: ["Heavy Footwear"],
+	Slot5: ["Potion"],
+	Slot6: ["Shield"],
+	Element: "Fire",
+},
+
+not includes @
+<radio-button class="${Class}" value="${Slot}" title="${Slot1}&#0010${Slot2}&#0010${Slot3}&#0010${Slot4}&#0010${Slot6}&#0010${Slot6}">${Job}<br>${PromotionJob}</radio-button>
+
+includes @
+<radio-button class="${Class}" value="${Slot}" title="${Slot1}&#0010${Slot2}&#0010${Slot3}&#0010${Slot4}&#0010${Slot5}&#0010${Slot6}">${Job}<br>(${PromotionJob})</radio-button>
+<radio-button class="${Class}" value="${Slot}" title="${Slot1}&#0010${Slot2}&#0010${Slot3}&#0010${Slot4}&#0010${Slot5}&#0010${Slot6}">(${Job})<br>${PromotionJob}</radio-button>
+
+@index.html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title>Shop Titans Assistant</title>
+<link rel="stylesheet" href="base.css?202109251700">
+<script src="dbmap.js?202109251700"></script>
+<script src="script.js?202109251700"></script>
+<script src="item.js?202109251700"></script>
+<script src="togglebutton.js?202109251700"></script>
+<script src="grouplist.js?202109251700"></script>
+<script src="showfilter.js?202109251700"></script>
+</head>
+
+<body>
+
+<header>
+
+<div class="flex">
+	<toggle-button id="selectView" class="changeView changeView2">
+		<radio-button value="viewItem" checked>アイテム一覧</radio-button>
+		<radio-button value="viewCheckType">進化進捗管理</radio-button>
+		<radio-button value="viewHero">ヒーロー装備管理</radio-button>
+		<radio-button value="viewInformation">このツールについて</radio-button>
+	</toggle-button>
+</div>
+<div class="targetView viewItem">
+<div class="flex mt5">
+	<toggle-button id="selectFormat" class="changeFormat">
+		<radio-button value="formatSell" checked>販売補助</radio-button>
+		<radio-button value="formatMarket">マーケット売買補助</radio-button>
+		<radio-button value="formatEnchantment">エンチャント補助</radio-button>
+		<radio-button value="formatStatus">ステータス閲覧</radio-button>
+		<radio-button value="formatCheckItem">開発進捗管理</radio-button>
+	</toggle-button>
+</div>
+</div>
+
+</header>
+
+<main class="reject">
+
+<div class="targetView viewItem targetFormat formatStatus formatSell formatMarket formatEnchantment">
+<div class="flex gap10 mb5">
+	<div class="targetFormat formatSell">
+	<div class="hint" title="価格、割引時の獲得エネルギー、追加販売時の消費エネルギーから、最適な販売方法を判定する機能&#0010推奨販売方法の背景色は品質を表し、[半]は割引、[倍]は追加販売、[－]はそのまま販売したほうがいいことを表す&#0010きちんと計算するために先に[開発進捗管理][進化進捗管理]で情報を入力してください&#0010品質の高いものはマーケットで高く売れるのでそのあたりは自己判断で&#0010&#0010[最大エネルギー]にはあなたのお店の最大エネルギを入力&#0010[割引コスト上限値]には普段割引しているアイテムのコストを入力&#0010[追加販売還元率下限値]には普段追加販売しているアイテムの還元率を入力&#0010&#0010計算式&#0010　コスト＝（価格÷２）÷割引時獲得エネルギー　　※要するに１エネルギーを獲得するのに支払うゴールド&#0010　還元率＝（追加販売価格－価格）÷追加販売消費エネルギー　※要するに１エネルギーで獲得するゴールド&#0010&#0010コストの少ない低ティアを割引し、稼いだエネルギーで還元率の高い高ティアを追加販売することで儲ける&#0010開発状況にもよるがティア10は還元率が悪く儲からないので追加販売するべきではないことがわかる&#0010黄金製品は非常に還元率が良いので、追加販売できるだけ最大エネルギーを高め、価格アップまで達成してから売り始めるのが儲けるコツ&#0010&#0010エレメントタイタンなどを取得すると「全アイテムの追加料金の値+1%」と説明されているがゲーム側が正しく1%を計算できていない&#0010多少誤差がありますがご了承ください">？</div>
+	</div>
+	<div class="targetFormat formatMarket">
+	<div class="hint" title="マーケットで売買するならいくらで取引すれば得か判定してくれる機能&#0010暫定的に追加販売するものだけを一覧表示&#0010&#0010仕入れの場合&#0010追加販売するにはエネルギーが必要&#0010なので必要エネルギー×エネルギーを貯めるためのコスト（＝割引コスト上限値）で追加販売コストを算出&#0010追加販売価格からコストを引いたものが純利益となり推奨仕入価格となる計算&#0010一覧の推奨仕入価格以下でマーケットから仕入れることができれば得となる&#0010黄金製品や高ティア品で安く売られているものを見つけよう&#0010&#0010販売の場合&#0010販売する場合はエネルギーが必要ないので手取りが純利益以上になるように売れるなら結果的に得となる&#0010マーケット取引には手数料が必要となるので手取りから提示額を算出（ゴールド売りなら10%、ジェム売りなら20%）&#0010これ以上で売れるなら得となる&#0010高品質品など思わぬ高値で売れるのでチェックしてみよう&#0010&#0010要注意！&#0010マーケット販売は商人経験値が入手できないという大きなデメリットがある&#0010ご利用は計画的に">？</div>
+	</div>
+	<div class="targetFormat formatEnchantment">
+	<div class="hint" title="エンチャント後の価格を可視化する機能&#0010&#0010ティア9アイテムにティア9のエレメントと精霊つけたら通常+70万となるが、元値によって増えたり減ったりするアレを事前にチェック">？</div>
+	</div>
+	<div class="targetFormat formatStatus">
+	<div class="hint" title="ヒーローの装備をグレードアップする際などの「回避付き装備って何があったっけ？」を解決する機能&#0010回避装備探すなら右の切替ボタンで[EVA]を選択といった感じで使用&#0010&#0010そのうちエンチャントによるステータス変化にも対応したいなぁ">？</div>
+	</div>
+
+	<toggle-button id="switchQuality" class="changeList">
+		<radio-button class="quality0" value="0" checked>普通</radio-button>
+		<radio-button class="quality1" value="1">上級</radio-button>
+		<radio-button class="quality2" value="2">上質</radio-button>
+		<radio-button class="quality3" value="3">エピック</radio-button>
+		<radio-button class="quality4" value="4">レジェンド</radio-button>
+	</toggle-button>
+
+	<div class="targetFormat formatStatus">
+	<toggle-button id="selectStatus" class="changeList">
+		<radio-button value="" checked>＊</radio-button>
+		<radio-button value="ATK">ATK</radio-button>
+		<radio-button value="DEF">DEF</radio-button>
+		<radio-button value="HP">HP</radio-button>
+		<radio-button value="EVA">EVA</radio-button>
+		<radio-button value="CRIT">CRIT</radio-button>
+	</toggle-button>
+	</div>
+
+<!--
+	<div class="targetFormat formatSell formatMarket formatEnchantment">
+	<toggle-button id="switchEvent" class="changeList">
+		<radio-button value="event0" checked>イベントなし</radio-button>
+		<radio-button value="event1">お買い得 追加料金 +25%</radio-button>
+		<radio-button value="event2">値切り 消費エネルギー -25%</radio-button>
+	</toggle-button>
+	</div>
+-->
+</div>
+</div>
+
+<div class="targetView viewItem">
+<div class="targetFormat formatSell formatMarket formatEnchantment">
+<div class="flex gap10 mb5">
+	<label>
+		<span class="info">最大エネルギー：</span>
+		<input type="text" id="$MaxEnergy" class="changeList" data-para="MaxEnergy" size="5">
+	</label>
+	<label>
+		<span class="info">割引コスト上限値：</span>
+		<input type="text" id="$DiscountThreshold" class="changeList" data-para="DiscountThreshold" size="5">
+	</label>
+	<label>
+		<span class="info">追加販売還元率下限値：</span>
+		<input type="text" id="$SurchargeThreshold" class="changeList" data-para="SurchargeThreshold" size="5">
+	</label>
+</div>
+</div>
+<div class="targetFormat formatMarket">
+<div class="flex gap10">
+	<div class="center">
+		<span>換算率：</span>
+	</div>
+	<label>
+		<input type="text" id="$Rate" class="changeRate" size="10" value="800,000">
+		<span>ゴールド　⇔　１ジェム換算</span>
+	</label>
+</div>
+<div class="flex gap10">
+	<div class="center">
+		<span>手取り：</span>
+	</div>
+	<label>
+		<input type="text" id="$gold" class="changeRate" size="10" value="0">
+		<span>ゴールド</span>
+	</label>
+	<div class="center">
+		<span>⇔</span>
+	</div>
+	<label>
+		<input type="text" id="$gem" class="changeRate" size="5" value="0">
+		<span>ジェム</span>
+	</label>
+</div>
+<div class="flex gap10 mb5">
+	<div class="center">
+		<span>提示額：</span>
+	</div>
+	<label>
+		<input type="text" id="$getgold" class="changeRate" size="10" value="0">
+		<span>ゴールド</span>
+	</label>
+	<div class="center">
+		<span>⇔</span>
+	</div>
+	<label>
+		<input type="text" id="$getgem" class="changeRate" size="5" value="0">
+		<span class="info">ジェム</span>
+	</label>
+	<div class="center">
+		<span>※下の一覧から売りたいものをクリック</span>
+	</div>
+</div>
+</div>
+</div>
+
+<div class="targetView viewItem targetFormat formatEnchantment">
+<div class="flex gap10 mb5">
+	<label>
+		<span class="info">エレメント付与：</span>
+		<select id="$ElementValue" class="changeList">
+			<option value="0">未選択</option>
+			<option value="350000" selected>ティア９のエレメント</option>
+			<option value="105000">7.火のエレメント(火)</option>
+			<option value="100000">7.潮のエレメント(水)</option>
+			<option value="99500">7.強風のエレメント(風)</option>
+			<option value="96500">7.野生のエレメント(地)</option>
+			<option value="96500">7.聖なるエレメント(光)</option>
+			<option value="105000">7.不浄のエレメント(闇)</option>
+			<option value="8150">4.燃えさしのエレメント(火)</option>
+			<option value="7400">4.水疱のエレメント(水)</option>
+			<option value="8550">4.そよ風のエレメント(風)</option>
+			<option value="9800">4.自然のエレメント(地)</option>
+			<option value="9600">4.光のエレメント(光)</option>
+			<option value="10500">4.汚染のエレメント(闇)</option>
+		</select>
+	</label>
+	<label>
+		<span class="info">精霊付与：</span>
+		<select id="$SpiritValue" class="changeList">
+			<option value="0">未選択</option>
+			<option value="350000" selected>ティア９の精霊</option>
+			<option value="110000">7.サイの精霊</option>
+			<option value="110000">7.フクロウの精霊</option>
+			<option value="115000">7.アルマジロの精霊</option>
+			<option value="125000">7.馬の精霊</option>
+			<option value="130000">7.カバの精霊</option>
+			<option value="130000">7.トカゲの精霊</option>
+			<option value="9200">4.狼の精霊</option>
+			<option value="9400">4.牡山羊の精霊</option>
+			<option value="9750">4.ワシの精霊</option>
+			<option value="10000">4.雄牛の精霊</option>
+			<option value="11000">4.毒蛇の精霊</option>
+			<option value="12000">4.猫の精霊</option>
+		</select>
+	</label>
+</div>
+</div>
+
+<div class="targetView viewItem">
+	<div id="$viewItem" class="flex gap10"></div>
+</div>
+
+<div class="targetView viewCheckType">
+	<div id="$viewCheckType" class="flex gap10"></div>
+</div>
+
+<div class="targetView viewHero">
+	<div id="$viewHero"></div>
+	<div class="information">
+	ヒーローごとの装備品およびエンチャント情報と換装予定を管理する機能（にする予定）<br>
+	全然インタフェースのイメージが沸いてこないので頓挫中…<br>
+	</div>
+</div>
+
+<div class="targetView viewInformation">
+	<div class="information">
+	2021/09/24 機能見直しおよび内部処理大幅改造<br>
+	2021/09/25 機能説明を？ボタンに移動（カーソルを合わせてみてね）<br>
+	<br>
+	9/25に計算値は正しくなるようにしたはずなので、あってないもの見つけたら報告してくれると助かります<br>
+	</div>
+</div>
+</main>
+
+<div class="targetView viewItem">
+<footer>
+<div class="mb5">
+<toggle-button id="filterTier" class="changeList">
+	<reset-button checked>全選択</reset-button>
+	<check-button value="1">１</check-button>
+	<check-button value="2">２</check-button>
+	<check-button value="3">３</check-button>
+	<check-button value="4">４</check-button>
+	<check-button value="5">５</check-button>
+	<check-button value="6">６</check-button>
+	<check-button value="7">７</check-button>
+	<check-button value="8">８</check-button>
+	<check-button value="9">９</check-button>
+	<check-button value="10">10</check-button>
+	<check-button value="11">11</check-button>
+</toggle-button>
+</div>
+<div class="">
+<toggle-button id="filterRack" class="changeList">
+	<reset-button checked>全選択</reset-button>
+	<radio-button value="Sword,Axe,Mace,Spear,Staff,Dagger,Bow,Wand,Gun,Crossbow,">武器</radio-button>
+	<radio-button value="Helmet,Rogue Hat,Magician Hat,Heavy Armor,Light Armor,Clothes,Gauntlets,Gloves,Heavy Footwear,Light Footwear">防具</radio-button>
+	<radio-button value="Shield,Herbal Medicine,Potion,Spell,Ring,Amulet">アクセサリー</radio-button>
+	<radio-button value="Sword,Axe,Mace,Spear,Staff">縦置きラック</radio-button>
+	<radio-button value="Dagger,Bow,Wand,Gun,Crossbow,Shield">テーブル</radio-button>
+	<radio-button value="Helmet,Rogue Hat,Magician Hat">マネキン(頭)</radio-button>
+	<radio-button value="Heavy Armor,Light Armor,Clothes">マネキン(胴)</radio-button>
+	<radio-button value="Gauntlets,Gloves,Heavy Footwear,Light Footwear">マネキン(手足)</radio-button>
+	<radio-button value="Herbal Medicine,Potion,Spell,Ring,Amulet">棚</radio-button>
+</toggle-button>
+</div>
+<div id="showFilterType" is="show-filter" select="">
+	<img src="./image/Sword.png" class="Sword">
+	<img src="./image/Axe.png" class="Axe">
+	<img src="./image/Dagger.png" class="Dagger">
+	<img src="./image/Mace.png" class="Mace">
+	<img src="./image/Spear.png" class="Spear">
+	<img src="./image/Bow.png" class="Bow">
+	<img src="./image/Wand.png" class="Wand">
+	<img src="./image/Staff.png" class="Staff">
+	<img src="./image/Gun.png" class="Gun">
+	<img src="./image/Crossbow.png" class="Crossbow">
+	<img src="./image/Heavy Armor.png" class="Heavy-Armor">
+	<img src="./image/Light Armor.png" class="Light-Armor">
+	<img src="./image/Clothes.png" class="Clothes">
+	<img src="./image/Helmet.png" class="Helmet">
+	<img src="./image/Rogue Hat.png" class="Rogue-Hat">
+	<img src="./image/Magician Hat.png" class="Magician-Hat">
+	<img src="./image/Gauntlets.png" class="Gauntlets">
+	<img src="./image/Gloves.png" class="Gloves">
+	<img src="./image/Heavy Footwear.png" class="Heavy-Footwear">
+	<img src="./image/Light Footwear.png" class="Light-Footwear">
+	<img src="./image/Herbal Medicine.png" class="Herbal-Medicine">
+	<img src="./image/Potion.png" class="Potion">
+	<img src="./image/Spell.png" class="Spell">
+	<img src="./image/Shield.png" class="Shield">
+	<img src="./image/Ring.png" class="Ring">
+	<img src="./image/Amulet.png" class="Amulet">
+</div>
+</footer>
+</div>
+
+<div class="loading">Now Loading...</div>
+<div id="toTop"class="to-top reject"></div>
+
+</body>
+</html>
+
+@base.css
+:root {
+	--main-bg-color: #25151e;
+	--main-color: #fff;
+	--header-bg-color: #522c44;
+	--header-color: #fff;
+	--footer-bg-color: #522c44;
+	--footer-color: #fff;
+	--filter-bg-color: #522c44;
+	--filter-color: #fff;
+	--filter-border-color: #fff;
+	--totop-bg-color: #ccc;
+	--totop-color: #808080;
+/*
+	--main-bg-color: #fff;
+	--main-color: #000;
+	--header-bg-color: #eee;
+	--header-color: #000;
+	--footer-bg-color: #eee;
+	--footer-color: #000;
+	--filter-bg-color: #fff;
+	--filter-color: #000080;
+	--filter-border-color: #ccddf5;
+	--totop-bg-color: #ccc;
+	--totop-color: #808080;
+*/
+}
+html {
+	font-size: 62.5%;
+}
+body {
+	font-size: 1.6em;
+	margin: 0;
+	padding: 0;
+	overflow-y: scroll;
+	background: var(--main-bg-color);
+	color: var(--main-color);
+}
+header {
+	font-size: 1.2rem;
+	padding: 10px 15px;
+	box-sizing: border-box;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 1;
+	background: var(--header-bg-color);
+	color: var(--header-color);
+	user-select: none;
+}
+main {
+	font-size: 1.2rem;
+	padding: 10px 15px;
+	box-sizing: border-box;
+}
+footer {
+	padding: 5px 15px;
+	font-size: 1.2rem;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	box-sizing: border-box;
+	background: var(--footer-bg-color);
+	color: var(--footer-color);
+	z-index: 1;
+	user-select: none;
+}
+
+[type="text"] {
+	text-align: right;
+	height: 20px;
+}
+[type="text"]:focus {
+	text-align: left;
+}
+select {
+	height: 24px;
+}
+select, [type] {
+	cursor: pointer;
+}
+
+.loading {
+	position: fixed;
+	right: 10px;
+}
+.flex {
+	display: flex;
+	flex-wrap: wrap;
+}
+.gap5 {
+	gap: 5px;
+}
+.gap10 {
+	gap: 10px;
+}
+.mt5 {
+	margin-top: 5px;
+}
+.mt10 {
+	margin-top: 10px;
+}
+.mb5 {
+	margin-bottom: 5px;
+}
+.mb10 {
+	margin-bottom: 10px;
+}
+
+.filter-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 120%;
+	cursor: pointer;
+	z-index: 2;
+}
+.filter {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 20px 30px 10px;
+	white-space: nowrap;
+	font-size: 1rem;
+	border-radius: 10px;
+	cursor: pointer;
+	width: 80%;
+	background: var(--filter-bg-color);
+	color: var(--filter-color);
+	border: solid 5px var(--filter-border-color);
+}
+.message {
+	text-align: right;
+}
+
+.drag-and-drop {
+	cursor: grab;
+}
+.drag {
+	cursor: grabbing;
+}
+
+.to-top {
+	position: fixed;
+	right: 10px;
+	bottom: 10px;
+	border-radius: 50%;
+	opacity: .8;
+	cursor: pointer;
+	color: var(--totop-bg-color);
+	background: var(--totop-color);
+	font-size: 2rem;
+	z-index: 1;
+}
+.to-top:hover {
+	opacity: 1;
+}
+.to-top::before {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	content: "▲";
+	width: 35px;
+	height: 35px;
+	z-index: -1;
+}
+
+footer >.showHover {
+	display: none;
+}
+footer:hover >.showHover {
+	display: block;
+}
+
+.information {
+	background: #fff;
+	color: #333;
+	border-radius: 10px;
+	margin-top: 10px;
+	padding: 5px 10px;
+}
+.hint {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 5px 10px;
+	background: #ff0;
+	color: #fff;
+	cursor: pointer;
+	font-weight: bold;
+	border-radius: 5px;
+	text-shadow: 0px 0px 2px #000;
+}
+.center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.reject {
+	display: none;
+}
+
+@dbmap.js
+class DbConfig {
+	setStore(store) {
+		const path = location.pathname.replace(/\\/g, "/").replace(/\/[^/]*$/, "/");
+		this.dbName = `${store} with ${path}`;
+		this.storeName = store;
+		return this;
+	}
+	setKey(key) {
+		this.keyName = key;
+		return this;
+	}
+	setInit(initData) {
+		this.initData = initData;
+		return this;
+	}
+}
+
+class DbMap extends Map {
+	constructor(entries) {
+		super(entries);
+	}
+	async setDbConfig(dbconfig) {
+		if(!dbconfig?.storeName) throw new Error("DbMap.setDbConfig");
+		this.dbconfig = dbconfig;
+		this.db = await this.#open();
+		this.canUseDB = true;
+		await this.#Sync();
+		return this;
+	}
+	async #Sync() {
+		const keyList = await this.#getAllKeys();
+		for(const key of keyList) {
+			const value = await this.#get(key);
+			super.set(key, value);
+		}
+		for(const [k, v] of super.entries()) {
+			await this.#put(k, v);
+		}
+	}
+	get(key) {
+		if(this.dbconfig?.initData && !super.has(key)) super.set(key, {...this.dbconfig.initData});
+		return super.get(key);
+	}
+	async set(key, value) {
+		if(this.canUseDB) await this.#put(key, value);
+		return super.set(key, value);
+	}
+	async delete(key) {
+		if(this.canUseDB) await this.#delete(key);
+		return super.delete(key);
+	}
+	async clear() {
+		if(this.canUseDB) await this.#clear();
+		super.clear();
+	}
+	#open() {
+		return new Promise((resolve, reject) => {
+			const req = indexedDB.open(this.dbconfig.dbName);
+			const options = this.dbconfig.keyName
+				? { keyPath: this.dbconfig.keyName, autoIncrement: true }
+				: { autoIncrement: false };
+			req.onupgradeneeded = e => e.target.result.createObjectStore(this.dbconfig.storeName, options);
+			req.onsuccess = e => resolve(e.target.result);
+			req.onerror = e => reject(new Error("DbMap.#open"));
+		});
+	}
+	#getObjectStore(mode) {
+		const tran = this.db.transaction(this.dbconfig.storeName, mode);
+		return tran.objectStore(this.dbconfig.storeName);
+	}
+	#getAllKeys() {
+		return new Promise((resolve, reject) => {
+			const store = this.#getObjectStore("readonly");
+			const req = store.getAllKeys();
+			req.onsuccess = e => resolve(e.target.result);
+			req.onerror = e => reject(new Error("DbMap.#getAllKeys"));
+		});
+	}
+	#get(key) {
+		return new Promise((resolve, reject) => {
+			const store = this.#getObjectStore("readonly");
+			const req = store.get(key);
+			req.onsuccess = e => resolve(e.target.result);
+			req.onerror = e => reject(new Error("DbMap.#get"));
+		});
+	}
+	#put(key, value) {
+		if(this.dbconfig.keyName) value[this.dbconfig.keyName] = key;
+		return new Promise((resolve, reject) => {
+			const store = this.#getObjectStore("readwrite");
+			const req = this.dbconfig.keyName
+				? store.put(value)
+				: store.put(value, key);
+			req.onsuccess = e => resolve();
+			req.onerror = e => reject(new Error("DbMap.#put"));
+		});
+	}
+	#delete(key) {
+		return new Promise((resolve, reject) => {
+			const store = this.#getObjectStore("readwrite");
+			const req = store.delete(key);
+			req.onsuccess = e => resolve();
+			req.onerror = e => reject(new Error("DbMap.#delete"));
+		});
+	}
+	#clear() {
+		return new Promise((resolve, reject) => {
+			const store = this.#getObjectStore("readwrite");
+			const req = store.clear();
+			req.onsuccess = e => resolve();
+			req.onerror = e => reject(new Error("DbMap.#clear"));
+		});
+	}
+}
+
+/*	how to use
+	const init_data1 = [
+		["A", 100],
+		["B", 200],
+		["C", 300],
+	];
+	const dbconfig1 = new DbConfig().setStore("para");
+	const dbmap1 = await new DbMap(init_data1).setDbConfig(dbconfig1);
+	console.log(dbmap1.entries());
+	console.log(dbmap1.set("A", 110));
+	console.log(dbmap1.delete("B"));
+	console.log(dbmap1.set("D", 400));
+
+	const init_data2 = [
+		["A", { value: 100 }],
+		["B", { value: 200 }],
+		["C", { value: 300 }],
+	];
+	const dbconfig2 = new DbConfig().setStore("data");
+	const dbmap2 = await new DbMap(init_data2).setDbConfig(dbconfig2);
+	console.log(dbmap2.entries());
+	console.log(dbmap2.set("A", { value: 110 }));
+	console.log(dbmap2.delete("B"));
+	console.log(dbmap2.set("D", { value: 400 }));
+*/
+
+@script.js
+const myApp = {};
+document.addEventListener("DOMContentLoaded", async () => {
+	setResizeObserver();
+	await setupData();
+	setViewItem();
+	setViewCheckType();
+	setDragEvent();
+	setEvent();
+	document.querySelector(".loading").classList.add("reject");
+	document.querySelector("main").classList.remove("reject");
+});
+
+const setResizeObserver = () => {
+	const headerResizeObserver = new ResizeObserver(entries => {
+		document.querySelector("body").style.marginTop = `${entries[0].target.offsetHeight}px`;
+	});
+	headerResizeObserver.observe(document.querySelector("header"));
+
+	const footerResizeObserver = new ResizeObserver(entries => {
+		document.querySelector("body").style.marginBottom = `${entries[0].target.offsetHeight}px`;
+		document.querySelector(".loading").style.bottom = `${entries[0].target.offsetHeight}px`;
+	});
+	footerResizeObserver.observe(document.querySelector('footer'));
+}
+
+const setupData = async () => {
+	const init_para = [
+		["MaxEnergy", "3,000"],
+		["DiscountThreshold", "500"],
+		["SurchargeThreshold", "700"],
+	];
+	const dbconfig1 = new DbConfig().setStore("para");
+	myApp.ParaDbMap = await new DbMap(init_para).setDbConfig(dbconfig1);
+	$MaxEnergy.value = myApp.ParaDbMap.get("MaxEnergy");
+	$DiscountThreshold.value = myApp.ParaDbMap.get("DiscountThreshold");
+	$SurchargeThreshold.value = myApp.ParaDbMap.get("SurchargeThreshold");
+
+	const init_checkitem = {
+		ValueUp: false,
+	}
+	const dbconfig2 = new DbConfig().setStore("CheckItem").setInit(init_checkitem);
+	myApp.CheckItemDbMap = await new DbMap().setDbConfig(dbconfig2);
+
+	const init_checktype = {
+		CostDown: false,
+		TypeValueUp: false,
+		AllValueUp: false,
+	}
+	const dbconfig3 = new DbConfig().setStore("CheckType").setInit(init_checktype);
+	myApp.CheckTypeDbMap = await new DbMap().setDbConfig(dbconfig3);
+	myApp.AllValueUp = [...myApp.CheckTypeDbMap].filter(([k, v]) => v.AllValueUp).length;
+
+	myApp.ItemMap = new Map();
+	myApp.LocalStringMap = new Map(convEntries(LocalString));
+	const EnchantedEMap = new Map(convEntries(EnchantedE));
+	const EnchantedSMap = new Map(convEntries(EnchantedS));
+	const rejectType = ["Runestone", "Moonstone", "Enchantment"];
+	ItemEntries().forEach(([k, v]) => {
+		if(rejectType.includes(v.Type)) return;
+		v.LocalName = myApp.LocalStringMap.get(k) ?? k;
+		v.EnchantedE = EnchantedEMap.has(k);
+		v.EnchantedS = EnchantedSMap.has(k);
+		myApp.ItemMap.set(k, new ItemObject(v));
+	});
+}
+
+class ItemObject {
+	constructor(e) {
+		Object.entries(e).forEach(([k, v]) => this[k] = v);
+		this.CheckItem = myApp.CheckItemDbMap.get(this.Name);
+		this.CheckType = myApp.CheckTypeDbMap.get(this.Type);
+	}
+	get NowValue() {
+		const temp = this.CheckItem.ValueUp ? this.IncreaseValue : this.Value;
+		return [
+			temp * ValueWeight[0] / 100,
+			temp * ValueWeight[1] / 100,
+			temp * ValueWeight[2] / 100,
+			temp * ValueWeight[3] / 100,
+			temp * ValueWeight[4] / 100,
+		];
+	}
+	get RoundNowValue() {
+		return [
+			RoundValue(this.NowValue[0]),
+			RoundValue(this.NowValue[1]),
+			RoundValue(this.NowValue[2]),
+			RoundValue(this.NowValue[3]),
+			RoundValue(this.NowValue[4]),
+		];
+	}
+//	get DiscountCost() {
+//		return [
+//			Math.floor(this.RoundNowValue[0] / 2 / this.DiscountEnergy),
+//			Math.floor(this.RoundNowValue[1] / 2 / this.DiscountEnergy),
+//			Math.floor(this.RoundNowValue[2] / 2 / this.DiscountEnergy),
+//			Math.floor(this.RoundNowValue[3] / 2 / this.DiscountEnergy),
+//			Math.floor(this.RoundNowValue[4] / 2 / this.DiscountEnergy),
+//		];
+//	}
+//	get SurchargeValue() {
+//		return [
+//			this.RoundNowValue[0] * 2,
+//			this.RoundNowValue[1] * 2,
+//			this.RoundNowValue[2] * 2,
+//			this.RoundNowValue[3] * 2,
+//			this.RoundNowValue[4] * 2,
+//		];
+//	}
+	get NowSurchargeEnergy() {
+		return this.CheckType.CostDown ? this.SurchargeEnergyCD : this.SurchargeEnergy;
+	}
+//	get SurchargeCost() {
+//		return [
+//			Math.floor(this.RoundNowValue[0] / this.NowSurchargeEnergy),
+//			Math.floor(this.RoundNowValue[1] / this.NowSurchargeEnergy),
+//			Math.floor(this.RoundNowValue[2] / this.NowSurchargeEnergy),
+//			Math.floor(this.RoundNowValue[3] / this.NowSurchargeEnergy),
+//			Math.floor(this.RoundNowValue[4] / this.NowSurchargeEnergy),
+//		];
+//	}
+	get getATK() {
+		if(!("ATK" in this)) return ["", "", "", "", ""];
+		return [
+			Math.round(this.ATK * StatusWeight[0] / 100),
+			Math.round(this.ATK * StatusWeight[1] / 100),
+			Math.round(this.ATK * StatusWeight[2] / 100),
+			Math.round(this.ATK * StatusWeight[3] / 100),
+			Math.round(this.ATK * StatusWeight[4] / 100),
+		];
+	}
+	get getDEF() {
+		if(!("DEF" in this)) return ["", "", "", "", ""];
+		return [
+			Math.round(this.DEF * StatusWeight[0] / 100),
+			Math.round(this.DEF * StatusWeight[1] / 100),
+			Math.round(this.DEF * StatusWeight[2] / 100),
+			Math.round(this.DEF * StatusWeight[3] / 100),
+			Math.round(this.DEF * StatusWeight[4] / 100),
+		];
+	}
+	get getHP() {
+		if(!("HP" in this)) return ["", "", "", "", ""];
+		return [
+			Math.round(this.HP * StatusWeight[0] / 100),
+			Math.round(this.HP * StatusWeight[1] / 100),
+			Math.round(this.HP * StatusWeight[2] / 100),
+			Math.round(this.HP * StatusWeight[3] / 100),
+			Math.round(this.HP * StatusWeight[4] / 100),
+		];
+	}
+	get getEVA() {
+		if(!("EVA" in this)) return "";
+		return this.EVA === 0.05 ? "5%" : EVA;
+	}
+	get getCRIT() {
+		if(!("CRIT" in this)) return "";
+		return this.CRIT === 0.05 ? "5%" : CRIT;
+	}
+}
+
+const ItemEntries = () => {
+	return ItemList.map(data => {
+		const {
+			Name, Type, Tier, Value: sValue,
+			ATK: sATK, DEF: sDEF, HP: sHP, EVA: sEVA, CRIT: sCRIT,
+			"Unlock Prerequisite": UP,
+			"Crafting Upgrade 1": CU1, "Crafting Upgrade 2": CU2, "Crafting Upgrade 3": CU3, "Crafting Upgrade 4": CU4, "Crafting Upgrade 5": CU5,
+			"Discount Energy": sDiscountEnergy, "Surcharge Energy": sSurchargeEnergy
+		} = data;
+
+		const [Value, ATK, DEF, HP, EVA, CRIT, DiscountEnergy, SurchargeEnergy] = String2Number(sValue, sATK, sDEF, sHP, sEVA, sCRIT, sDiscountEnergy, sSurchargeEnergy);
+
+		const ValueIncrease = [CU1, CU2, CU3, CU4, CU5].includes("x1.5 Value Increase")
+			? 1.5
+			: [CU1, CU2, CU3, CU4, CU5].includes("x1.25 Value Increase")
+			? 1.25
+			: 1;
+		const IncreaseValue = Value * ValueIncrease;
+		const SurchargeEnergyCD = Math.floor(SurchargeEnergy * 0.9);
+		const GoldenChest = UP == "Golden Chest";
+
+		const result = {
+			Name, Type, Tier, Value, IncreaseValue,
+			DiscountEnergy, SurchargeEnergy, SurchargeEnergyCD,
+			ATK, DEF, HP, EVA, CRIT,
+			GoldenChest
+		};
+
+		if(isNaN(ATK))  delete result.ATK;
+		if(isNaN(DEF))  delete result.DEF;
+		if(isNaN(HP))   delete result.HP;
+		if(isNaN(EVA))  delete result.EVA;
+		if(isNaN(CRIT)) delete result.CRIT;
+
+		return [Name, result];
+	});
+}
+const convEntries = data => data.split("\n").filter(Boolean).map(d => d.split("\t"));
+
+const equalConditions = ["boolean", "number", "string"];
+const filterProp = (key, target) => v => equalConditions.includes(typeof target) ? v[key] === target : target.includes(v[key]);
+const getProp = key => v => v[key];
+const String2Number = (...args) => args.map(s => Number(s.replaceAll(",", "")));
+
+const ValueWeight = [100, 125, 200, 300, 500];
+const StatusWeight = [100, 125, 150, 200, 300];
+const RoundValue = value => {
+	let                  x = 50000;
+	if(value <= 1000000) x =  5000;
+	if(value <=  100000) x =   500;
+	if(value <=   10000) x =    50;
+	if(value <=    1000) x =    10;
+	return Math.round(value / x) * x;
+}
+const tagLocalNumber = (sList, ...vList) => {
+	const LocalValue = v => {
+		return v.toLocaleString();
+	}
+	return vList
+		.map((v, i) => sList[i] + LocalValue(v))
+		.concat(sList.slice(vList.length))
+		.join("")
+	;
+}
+
+const setViewItem = () => {
+	const fragment = new DocumentFragment();
+	const groupList = [
+		"Sword", "Axe", "Dagger", "Mace", "Spear", "Bow", "Wand", "Staff", "Gun", "Crossbow",
+		"Heavy Armor", "Light Armor", "Clothes", "Helmet", "Rogue Hat", "Magician Hat", "Gauntlets", "Gloves", "Heavy Footwear", "Light Footwear",
+		"Herbal Medicine", "Potion", "Spell", "Shield", "Ring", "Amulet",
+	];
+	groupList.forEach(group => {
+		const grouplist = document.createElement("group-list");
+		grouplist.classList.add("targetList");
+		grouplist.setAttribute("format", "");
+		grouplist.setAttribute("key", "Type");
+		grouplist.setAttribute("group", group);
+		fragment.appendChild(grouplist);
+	});
+	$viewItem.appendChild(fragment);
+};
+
+const setViewCheckType = () => {
+	const fragment = new DocumentFragment();
+	const groupList = {
+		GroupA: ["Sword", "Axe", "Dagger", "Mace", "Spear", "Bow", "Wand", "Staff", "Gun", "Crossbow"],
+		GroupB: ["Heavy Armor", "Light Armor", "Clothes","Helmet", "Rogue Hat", "Magician Hat", "Gauntlets", "Gloves"],
+		GroupC: ["Heavy Footwear","Light Footwear", "Herbal Medicine", "Potion", "Spell", "Shield", "Ring", "Amulet"],
+		GroupD: ["Stone"],
+		GroupE: ["Element","Spirit"],
+	};
+	Object.entries(groupList).forEach(([k, v]) => {
+		const grouplist = document.createElement("group-list");
+		grouplist.setAttribute("format", "formatCheckType");
+		grouplist.setAttribute("group", k);
+		grouplist.setAttribute("list", v);
+		fragment.appendChild(grouplist);
+	});
+	$viewCheckType.appendChild(fragment);
+};
+
+const setDragEvent = () => {
+	const mdown = e => {
+		e.currentTarget.classList.add("drag");
+		myApp.x = e.pageX - e.currentTarget.offsetLeft;
+		myApp.y = e.pageY - e.currentTarget.offsetTop;
+		document.body.addEventListener("mousemove", mmove);
+	}
+	const mmove = e => {
+		e.preventDefault();
+		const drag = document.querySelector(".drag");
+		drag.style.top = `${e.pageY - myApp.y}px`;
+		drag.style.left = `${e.pageX - myApp.x}px`;
+		drag.addEventListener("mouseup", mup);
+	}
+	const mup = e => {
+		document.body.removeEventListener("mousemove", mmove);
+		const drag = document.querySelector(".drag");
+		drag.removeEventListener("mouseup", mup);
+		drag.classList.remove("drag");
+	}
+	document.querySelectorAll(".drag-and-drop").forEach(e => e.addEventListener("mousedown", mdown));
+}
+
+const setEvent = () => {
+	document.querySelectorAll(".changeList").forEach(e => {
+		e.addEventListener("changed", () => {
+			const targetTier = filterTier.value;
+			const targetType = filterRack.value;
+			showFilterType.setAttribute("select", targetType);
+
+			document.querySelectorAll(".targetList").forEach(e => {
+				const key = e.getAttribute("key");
+				const group = e.getAttribute("group");
+				const list = [...myApp.ItemMap.values()]
+					.filter(filterProp(key, group))
+					.filter(filterProp("Tier", targetTier))
+					.filter(filterProp("Type", targetType))
+					.map(getProp("Name"));
+				e.setAttribute("list", list);
+			});
+		});
+		e.addEventListener("change", () => {
+			const targetTier = filterTier.value;
+			const targetType = filterRack.value;
+			showFilterType.setAttribute("select", targetType);
+
+			document.querySelectorAll(".targetList").forEach(e => {
+				const key = e.getAttribute("key");
+				const group = e.getAttribute("group");
+				const list = [...myApp.ItemMap.values()]
+					.filter(filterProp(key, group))
+					.filter(filterProp("Tier", targetTier))
+					.filter(filterProp("Type", targetType))
+					.map(getProp("Name"));
+				e.setAttribute("list", list);
+			});
+		});
+	});
+
+	document.querySelectorAll(`[type="text"]`).forEach(e => {
+		e.addEventListener("focus", e => {
+			const me = e.currentTarget;
+			me.value = me.value.replaceAll(",", "");
+			me.select();
+		});
+		e.addEventListener("blur", async e => {
+			const me = e.currentTarget;
+			me.value = (isNaN(me.value) ? 0 : Number(me.value.replaceAll(",", ""))).toLocaleString();
+			await myApp.ParaDbMap.set(me.dataset.para, me.value);
+		});
+	});
+
+	filterTier.dispatchEvent(event);
+
+	document.querySelectorAll(".changeView").forEach(e => {
+		e.addEventListener("changed", e => {
+			const view = e.currentTarget.value[0];
+			document.querySelectorAll(".targetView").forEach(e => e.classList.toggle("reject", !e.classList.contains(view)));
+		});
+	});
+	document.querySelectorAll(".changeView2").forEach(e => {
+		e.addEventListener("changed", e => {
+			const view = e.currentTarget.value[0];
+			const format = selectFormat.value[0];
+			if(view === "viewItem") document.querySelectorAll(".targetList").forEach(e => e.setAttribute("format", format));
+			if(view === "viewCheckType") document.querySelectorAll(".targetList").forEach(e => e.setAttribute("format", "formatCheckType"));
+		});
+	});
+	selectView.dispatchEvent(event);
+
+	document.querySelectorAll(".changeFormat").forEach(e => {
+		e.addEventListener("changed", e => {
+			const format = e.currentTarget.value[0];
+			document.querySelectorAll(".targetFormat").forEach(e => e.classList.toggle("reject", !e.classList.contains(format)));
+			document.querySelectorAll(".targetList").forEach(e => e.setAttribute("format", format));
+		});
+	});
+	selectFormat.dispatchEvent(event);
+
+	window.addEventListener("scroll", () => {
+		clearTimeout(myApp.timer);
+		myApp.timer = setTimeout(() => {
+			toTop.classList.toggle("reject", window.pageYOffset == 0);
+		}, 300);
+	});
+	toTop.addEventListener("click", () => {
+		window.scroll({top: 0, behavior: "smooth"});
+	});
+}
+
+const event = new CustomEvent("changed", {
+	bubbles: true,
+	composed: true,
+});
+
+const changeCheckItem = async e => {
+	const me = e.currentTarget;
+	const {Name, key} = me.dataset;
+	const checkitem = myApp.CheckItemDbMap.get(Name);
+	checkitem[key] = me.checked;
+	await myApp.CheckItemDbMap.set(Name, checkitem);
+}
+
+const changeCheckType = async e => {
+	const me = e.currentTarget;
+	const {Name, key} = me.dataset;
+	const checktype = myApp.CheckTypeDbMap.get(Name);
+	checktype[key] = me.checked;
+	await myApp.CheckTypeDbMap.set(Name, checktype);
+
+	if(key === "AllValueUp") myApp.AllValueUp = [...myApp.CheckTypeDbMap].filter(([k, v]) => v.AllValueUp).length;
+}
+
+const changeRate = e => {
+	const me = e.currentTarget;
+	const sGold = me.dataset.value;
+	const sRate = $Rate.value;
+	const [Gold, Rate] = String2Number(sGold, sRate);
+	const Gem = Math.ceil(Gold / Rate);
+	const GetGold = Math.ceil(Gold / 0.9);
+	const GetGem = Math.ceil(Gem / 0.8);
+
+	$gold.value = tagLocalNumber`${Gold}`;
+	$gem.value = tagLocalNumber`${Gem}`;
+	$getgold.value = tagLocalNumber`${GetGold}`;
+	$getgem.value = tagLocalNumber`${GetGem}`;
+}
+
+const EnchantedE = `
+Canopy Cap
+Trailblazers
+Ice Pick
+Scroll of Cleansing
+Tailwind
+Darkwood Branch
+Arboreal Blade
+Swift Mitts
+Emerald Ring
+Aurum Ward
+Molten Voulge
+Eclipse Amulet
+Tome of the Night
+Brinewater Helm
+Amber Staff
+Ceremonial Breastplate
+Cindersole
+Hat of the Four Winds
+Triton Lance
+Vestal Raiments
+Sungrasp Gauntlets
+Glade Guard Armor
+Quetzalcoatl
+Black Wyrm Claws
+Meteor Hammer
+Stonesplitter
+Nomad Veil	
+Brinewater Do
+Bottled Mirth
+Soulstone Ring
+Damocles
+Levia Fang
+Mistpeak Bloom
+Alpine Stride
+Crusader Helmet
+Phoenix Staff
+Prometheon
+Tidebringer
+Gaia Enforcer
+Storm Dragon Mask
+Purgatory
+Plaguewalkers
+Amber Citadel
+Northwind Gem
+Caladbolg
+Terra Tyrannis
+Longinus
+Nightmare Fellblade
+Phoenix Litany
+Monsoon Heart
+Bleakspire Roots
+Last Breath
+Sunglow Impact
+Abyssal Hood
+`;
+
+const EnchantedS = `
+Mundra's Masher
+Mundra's Hornbow
+Mundra's Scepter
+Mundra's Tabard
+Mundra's Amulet
+`;
+
+const LocalString = `
+`;
+
